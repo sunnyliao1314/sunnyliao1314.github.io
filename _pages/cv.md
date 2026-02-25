@@ -9,30 +9,19 @@ redirect_from:
 
 {% include base_path %}
 
-Education
+教育经历
 ======
-* Ph.D in Version Control Theory, GitHub University, 2018 (expected)
-* M.S. in Jekyll, GitHub University, 2014
-* B.S. in GitHub, GitHub University, 2012
+**华中科技大学**，本科，2023年9月--2027年6月
+-   电子信息与通信学院，电子信息工程卓越计划实验班
+-   GPA: 4.38/5.00
 
-Work experience
+获奖经历
 ======
-* Spring 2024: Academic Pages Collaborator
-  * GitHub University
-  * Duties includes: Updates and improvements to template
-  * Supervisor: The Users
-
-* Fall 2015: Research Assistant
-  * GitHub University
-  * Duties included: Merging pull requests
-  * Supervisor: Professor Hub
-
-* Summer 2015: Research Assistant
-  * GitHub University
-  * Duties included: Tagging issues
-  * Supervisor: Professor Git
+* 第16届全国大学生数学竞赛（非数学A类）湖北省级一等奖
+* 第34届高教社杯全国大学生数学建模竞赛湖北省级一等奖
+* 全国计算机等级考试三级网络技术 良好
   
-Skills
+技术栈
 ======
 * Skill 1
 * Skill 2
@@ -41,7 +30,7 @@ Skills
   * Sub-skill 2.3
 * Skill 3
 
-Publications
+项目经历
 ======
   <ul>{% for post in site.publications reversed %}
     {% include archive-single-cv.html %}
