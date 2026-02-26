@@ -1,6 +1,6 @@
 ---
 layout: archive
-title: "CV"
+title: ""
 permalink: /cv/
 author_profile: true
 redirect_from:
@@ -13,41 +13,25 @@ redirect_from:
 ======
 **华中科技大学**，本科，2023年9月--2027年6月
 -   电子信息与通信学院，电子信息工程卓越计划实验班
--   GPA: 4.38/5.00
+-   GPA: 4.37/5.00
 
 获奖经历
 ======
 * 第16届全国大学生数学竞赛（非数学A类）湖北省级一等奖
 * 第34届高教社杯全国大学生数学建模竞赛湖北省级一等奖
+* 第41届美国大学生数学建模竞赛S奖
+* 第14届全国大学生电子设计竞赛湖北省级三等奖
 * 全国计算机等级考试三级网络技术 良好
-  
+
 技术栈
 ======
-* Skill 1
-* Skill 2
-  * Sub-skill 2.1
-  * Sub-skill 2.2
-  * Sub-skill 2.3
-* Skill 3
+* 熟练使用C语言，完成过C语言实现2D物理引擎的小游戏开发，STM32小型工程开发
+* 熟练使用Python、Matlab语言，能够完成数学建模问题的解决与可视化
+* 熟练使用Verilog语言，完成过Gowin、Xilinx小型工程开发
 
 项目经历
 ======
-  <ul>{% for post in site.publications reversed %}
-    {% include archive-single-cv.html %}
-  {% endfor %}</ul>
-  
-Talks
-======
-  <ul>{% for post in site.talks reversed %}
-    {% include archive-single-talk-cv.html  %}
-  {% endfor %}</ul>
-  
-Teaching
-======
-  <ul>{% for post in site.teaching reversed %}
-    {% include archive-single-cv.html %}
-  {% endfor %}</ul>
-  
-Service and leadership
-======
-* Currently signed in to 43 different slack teams
+* 基于MSP432的单相功率分析仪设计
+* 基于Gowin Logicpai FPGA的简易双通道示波器设计
+* 基于STM32的蓝牙计步器设计
+* 基于C语言实现的2D物理引擎小游戏开发
