@@ -28,3 +28,4 @@ redirect_from:
 
 ### 绘画
 - 线描｜[《樱羽艾玛》](http://xhslink.com/o/VJOFkS3yO0)
+- 水墨画｜[《路转溪桥忽见》庚子年小暑 作](https://sunnyliao1314.github.io/files/notes/%E6%B0%B4%E5%A2%A8%E7%94%BB.jpg)
