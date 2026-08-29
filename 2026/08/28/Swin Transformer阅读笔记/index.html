@@ -1,0 +1,2378 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Qingxing Liao">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="Swin Transformer：基于移位窗口的层级视觉 Transformer 原题： Swin Transformer: Hierarchical Vision Transformer using Shifted Windows 作者： Ze Liu†*, Yutong Lin†*, Yue Cao*, Han Hu*‡, Yixuan Wei†, Zheng Zhang, Stephen">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Swin Transformer阅读笔记">
+<meta property="og:url" content="http://example.com/2026/08/28/Swin%20Transformer%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/index.html">
+<meta property="og:site_name" content="Qingxingliao Blog">
+<meta property="og:description" content="Swin Transformer：基于移位窗口的层级视觉 Transformer 原题： Swin Transformer: Hierarchical Vision Transformer using Shifted Windows 作者： Ze Liu†*, Yutong Lin†*, Yue Cao*, Han Hu*‡, Yixuan Wei†, Zheng Zhang, Stephen">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/2026/08/28/Swin%20Transformer%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/Pasted%20image%2020260825125957.png">
+<meta property="og:image" content="http://example.com/2026/08/28/Swin%20Transformer%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/Pasted%20image%2020260825130027.png">
+<meta property="og:image" content="http://example.com/2026/08/28/Swin%20Transformer%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/figure-1.png">
+<meta property="og:image" content="http://example.com/2026/08/28/Swin%20Transformer%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/figure-2.png">
+<meta property="og:image" content="http://example.com/2026/08/28/Swin%20Transformer%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/figure-3.png">
+<meta property="og:image" content="http://example.com/2026/08/28/Swin%20Transformer%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/figure-4.png">
+<meta property="article:published_time" content="2026-08-28T13:24:53.000Z">
+<meta property="article:modified_time" content="2026-08-28T14:44:42.286Z">
+<meta property="article:author" content="Qingxing Liao">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://example.com/2026/08/28/Swin%20Transformer%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/Pasted%20image%2020260825125957.png">
+  
+  
+  
+  <title>Swin Transformer阅读笔记 - Qingxingliao Blog</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1736178_k526ubmyhba.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.9.9","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"expand_all":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"openkounter":{"server_url":"https://open-kounter.mintimate.cn","path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 8.1.2"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Qingxingliao Blog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content (desktop) -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- Mobile grid menu overlay -->
+<div id="mobile-grid-menu" class="d-lg-none">
+  <div class="mobile-grid-menu-inner">
+    <div class="container">
+      <div class="row">
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-home-fill"></i>
+                  <span>首页</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/archives/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-archive-fill"></i>
+                  <span>归档</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/categories/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-category-fill"></i>
+                  <span>分类</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/tags/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-tags-fill"></i>
+                  <span>标签</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/about/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-user-fill"></i>
+                  <span>关于</span>
+                </div>
+              </a>
+            </div>
+          
+        
+        
+          <div class="col-4 mobile-grid-cell" id="mobile-search-btn">
+            <a href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <div class="mobile-grid-item">
+                <i class="iconfont icon-search"></i>
+                <span>搜索</span>
+              </div>
+            </a>
+          </div>
+        
+        
+          <div class="col-4 mobile-grid-cell" id="mobile-color-toggle-btn"
+               data-label-light="开灯"
+               data-label-dark="关灯">
+            <a href="javascript:;" aria-label="Color Toggle">
+              <div class="mobile-grid-item">
+                <i class="iconfont icon-dark" id="mobile-color-toggle-icon"></i>
+                <span id="mobile-color-toggle-label">关灯</span>
+              </div>
+            </a>
+          </div>
+        
+      </div>
+    </div>
+  </div>
+</div>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/%5B%E8%94%9A%E8%97%8D%E6%AA%94%E6%A1%88%5D%20%E3%80%90%E8%94%9A%E8%97%8D%E6%AA%94%E6%A1%88%E3%80%91%E9%A6%96%E6%94%AFPV%E6%90%B6%E5%85%88%E6%9B%9D%E5%85%89%20(Y0Dm7AF36-k)1256.jpg') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="Swin Transformer阅读笔记"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2026-08-28 21:24" pubdate>
+          2026年8月28日 晚上
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          36k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          298 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">Swin Transformer阅读笔记</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h1 id="swin-transformer基于移位窗口的层级视觉-transformer">Swin Transformer：基于移位窗口的层级视觉 Transformer</h1>
+<p><strong>原题：</strong> Swin Transformer: Hierarchical Vision Transformer using Shifted Windows<br />
+<strong>作者：</strong> Ze Liu†*, Yutong Lin†*, Yue Cao*, Han Hu*‡, Yixuan Wei†, Zheng Zhang, Stephen Lin, Baining Guo<br />
+<strong>机构：</strong> 微软亚洲研究院<br />
+<strong>版本：</strong> arXiv:2103.14030v2，2021 年 8 月 17 日</p>
+<blockquote>
+<p>* 同等贡献。† 在微软亚洲研究院实习期间完成本工作。‡ 联系人。</p>
+</blockquote>
+<h2 id="摘要">摘要</h2>
+<p>本文提出一种新的视觉 Transformer——Swin Transformer，可作为计算机视觉中的通用骨干网络。把 Transformer 从语言领域迁移到视觉领域，主要面临两类差异：一是视觉实体的尺度变化远大于文本中的词；二是图像像素的分辨率远高于文本序列。</p>
+<p>为解决这些问题，我们设计了一种层级 Transformer，并通过移位窗口（shifted windows）计算其表征。该方案把自注意力限制在互不重叠的局部窗口内，同时允许信息跨窗口传递，因此兼顾了效率与建模能力。层级架构能够灵活建模不同尺度的视觉对象；当窗口尺寸固定时，模型的计算复杂度相对于图像尺寸呈线性增长。</p>
+<p>凭借这些特点，Swin Transformer 可广泛用于图像分类和密集预测任务。在 ImageNet-1K 图像分类上，模型取得 87.3% 的 top-1 准确率；在 COCO test-dev 的目标检测和实例分割上，分别达到 58.7 box AP 和 51.1 mask AP；在 ADE20K val 语义分割上达到 53.5 mIoU。与此前最优结果相比，COCO 上分别提高 2.7 box AP 和 2.6 mask AP，ADE20K 上提高 3.2 mIoU，显示出 Transformer 作为视觉骨干网络的巨大潜力。本文的层级设计与移位窗口方法同样有利于纯 MLP 架构。代码和模型已公开于 <a target="_blank" rel="noopener" href="https://github.com/microsoft/Swin-Transformer" class="uri">https://github.com/microsoft/Swin-Transformer</a>。 <img src="/2026/08/28/Swin%20Transformer%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/Pasted%20image%2020260825125957.png" srcset="/img/loading.gif" lazyload class=""> <img src="/2026/08/28/Swin%20Transformer%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/Pasted%20image%2020260825130027.png" srcset="/img/loading.gif" lazyload class="" title="图1：一图流Swin Transformer架构与主要贡献"></p>
+<h2 id="引言">1 引言</h2>
+<p>长期以来，计算机视觉建模一直由卷积神经网络（Convolutional Neural Networks，CNN）主导。AlexNet [39] 在 ImageNet 图像分类挑战中取得突破性成绩后，CNN 架构不断演进：网络更深 [30, 76]，连接更广 [34]，卷积形式也更加复杂 [70, 18, 84]。CNN 被广泛用作各类视觉任务的骨干网络，这些架构进步也由此推动了整个领域的性能提升。</p>
+<p>自然语言处理（Natural Language Processing，NLP）的网络架构则沿着另一条路线发展，如今最主流的架构是 Transformer [64]。Transformer 面向序列建模与转换任务设计，其突出特点是使用注意力机制来刻画数据中的长程依赖。Transformer 在语言领域取得巨大成功后，研究者开始探索把它引入计算机视觉，并已在<mark>图像分类</mark> [20] 和视觉—语言联合建模 [47] 等任务上展现出良好前景。</p>
+<p>本文希望进一步扩大 Transformer 的适用范围，让它像 NLP 中的 Transformer、视觉中的 CNN 一样，成为计算机视觉的通用骨干网络。<mark>语言与视觉</mark>两种模态之间的差异，是将语言 Transformer 的高性能迁移到视觉领域时所遇挑战的主要来源。</p>
+<p>第一项差异是<mark>尺度</mark>。语言 Transformer 的基本处理单元是词 token，其尺度固定；视觉元素的尺度却可能相差悬殊，目标检测等任务尤其重视这一问题 [42, 53, 54]。现有 Transformer 模型 [64, 20] 中的 token 均为固定尺度，因此并不适合这些视觉应用。</p>
+<p>第二项差异是<mark>分辨率</mark>。图像像素的分辨率远高于文本段落中的词。语义分割等任务需要在像素层面进行密集预测，而自注意力的计算复杂度随图像尺寸呈二次增长，直接在高分辨率图像上运行 Transformer 难以承受。</p>
+<p>为克服这些问题，我们提出通用 Transformer 骨干网络 Swin Transformer。它构建层级特征图，且计算复杂度相对于图像尺寸呈线性增长。如图 1(a) 所示，Swin Transformer 从小尺寸图像块开始，在更深的 Transformer 层中逐步合并相邻图像块，从而形成层级表征。借助层级特征图，它能够方便地使用特征金字塔网络（FPN）[42]、U-Net [51] 等成熟的密集预测技术。 <img src="/2026/08/28/Swin%20Transformer%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/figure-1.png" srcset="/img/loading.gif" lazyload class="" title="图 1：（a）Swin Transformer 在较深层合并图像块（灰色），形成层级特征图；自注意力只在局部窗口（红色）内计算，每个窗口内的patch数量不变，因此复杂度相对于输入图像尺寸呈线性增长。它可作为图像分类和密集识别任务的通用骨干网络。（b）此前的Vision Transformer [20] 只生成单一低分辨率特征图，并在全局范围计算自注意力，因此复杂度相对于图像尺寸呈二次增长"></p>
+<p>模型的线性复杂度来自局部自注意力：图像被划分为互不重叠的窗口（图中红色边框），自注意力只在各窗口内部计算。由于每个窗口中的图像块数量固定，计算复杂度便与图像尺寸呈线性关系。相比之下，早期 Transformer 视觉架构 [20] 只生成单一分辨率特征图，而且复杂度呈二次增长。Swin Transformer 因而更适合作为多种视觉任务的通用骨干网络。</p>
+<p>Swin Transformer 的关键设计，是在相邻自注意力层之间移动窗口划分位置，如图 2 所示。移位后的窗口跨越前一层的窗口边界，在不同窗口之间建立连接，显著增强建模能力，实验结果见表 4。该策略在实际硬件上也很高效：同一窗口中的全部查询图像块共享同一组键¹，有利于内存访问。以往基于滑动窗口的自注意力 [33, 50] 中，不同查询像素对应不同的键集合²，因此在通用硬件上的延迟很高。表 5 和表 6 的实验表明，移位窗口与滑动窗口的建模能力相近，但延迟明显更低。移位窗口也能提升纯 MLP 架构 [61] 的性能。 <img src="/2026/08/28/Swin%20Transformer%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/figure-2.png" srcset="/img/loading.gif" lazyload class="" title="图 2：Swin Transformer 中采用移位窗口计算自注意力。第 l 层（左）采用常规窗口划分，并在各窗口内计算自注意力；下一层 l+1（右）移动窗口划分位置，形成一组新窗口。新窗口中的自注意力跨越第 l 层的窗口边界，从而在原窗口之间建立连接"></p>
+<p>Swin Transformer 在图像分类、目标检测和语义分割上均表现出色。在延迟相近的情况下，它显著优于 ViT/DeiT [20, 63] 和 ResNe(X)t [30, 70]。模型在 COCO test-dev 上达到 58.7 box AP 和 51.1 mask AP，分别比此前最优结果 Copy-paste [26]（不使用外部数据）和 DetectoRS [46] 高 2.7 与 2.6 个百分点；在 ADE20K val 上达到 53.5 mIoU，比此前最优的 SETR [81] 高 3.2 个百分点；在 ImageNet-1K 图像分类上，top-1 准确率达到 87.3%。</p>
+<p>我们相信，计算机视觉与自然语言处理若能共享统一架构，将有利于两个领域的发展：这不仅便于联合建模视觉与文本信号，也能让两个领域的建模知识得到更深层次的共享。我们希望 Swin Transformer 在多种视觉问题上的良好表现，能推动社区进一步探索视觉与语言的统一建模。</p>
+<blockquote>
+<p>¹ 查询（query）和键（key）是自注意力层中的投影向量。<br />
+² 在通用硬件上，滑动窗口卷积可以借助特征图上共享的卷积核权重高效实现；滑动窗口自注意力却很难获得同样高效的内存访问。</p>
+</blockquote>
+<h2 id="相关工作">2 相关工作</h2>
+<h3 id="cnn-及其变体">CNN 及其变体</h3>
+<p>CNN 是计算机视觉中的标准网络模型。CNN 虽已存在数十年 [40]，但直到 AlexNet [39] 出现后才真正兴起并成为主流。此后，VGG [52]、GoogLeNet [57]、ResNet [30]、DenseNet [34]、HRNet [65] 和 EfficientNet [58] 等更深、更有效的卷积架构持续推动深度学习发展。研究者也不断改进单个卷积层，例如深度卷积 [70] 和可变形卷积 [18, 84]。</p>
+<p>CNN 及其变体仍是计算机视觉应用的主要骨干架构，但我们希望强调 Transformer 类架构在视觉—语言统一建模上的潜力。本文方法在多项基础视觉识别任务上均取得强劲性能，我们希望它能推动视觉领域的建模范式转变。</p>
+<h3 id="基于自注意力的骨干架构">基于自注意力的骨干架构</h3>
+<p>受 NLP 中自注意力层和 Transformer 架构成功的启发，一些工作用自注意力层替换了 ResNet 中部分或全部空间卷积层 [33, 50, 80]。这些方法在每个像素周围的局部窗口内计算自注意力，以降低优化难度 [33]；相比对应的 ResNet，它们在准确率/FLOPs 权衡上略有改善，但昂贵的内存访问使实际延迟显著高于卷积网络 [33]。本文不采用滑动窗口，而是在相邻层之间移动窗口，使模型可以在通用硬件上高效实现。</p>
+<h3 id="用自注意力transformer-补充-cnn">用自注意力/Transformer 补充 CNN</h3>
+<p>另一类工作在标准 CNN 架构中加入自注意力层或 Transformer。自注意力可以增强骨干网络 [67, 7, 3, 71, 23, 74, 55] 或任务头 [32, 27]，使其能够编码远距离依赖或异构交互。近来，Transformer 的编码器—解码器设计也被用于目标检测和实例分割 [8, 13, 85, 56]。本文研究的是 Transformer 在基础视觉特征提取中的应用，与这些工作互为补充。</p>
+<h3 id="基于-transformer-的视觉骨干网络">基于 Transformer 的视觉骨干网络</h3>
+<p>与本文最相关的是 Vision Transformer（ViT）[20] 及其后续工作 [63, 72, 15, 28, 66]。ViT 开创性地把 Transformer 直接用于互不重叠的中等尺寸图像块，在图像分类中取得了令人瞩目的速度—精度权衡。ViT 依赖 JFT-300M 等大规模训练数据；DeiT [63] 则引入多种训练策略，使 ViT 在规模较小的 ImageNet-1K 上也能有效训练。</p>
+<p>ViT 的图像分类结果令人鼓舞，但它不适合充当密集视觉任务或高分辨率输入的通用骨干网络：其特征图分辨率较低，而且复杂度随图像尺寸呈二次增长。少量工作尝试通过直接上采样或反卷积，把 ViT 用于目标检测和语义分割，但性能相对较低 [2, 81]。</p>
+<p>与本文同期的一些工作修改了 ViT 架构，以改善图像分类性能 [72, 15, 28]。尽管本文关注通用性能而非单一分类任务，实验仍显示 Swin Transformer 在这些方法中取得最佳速度—精度权衡。另一项同期工作 [66] 也尝试在 Transformer 上构建多分辨率特征图，但其复杂度仍随图像尺寸呈二次增长。本文方法的复杂度为线性，并在局部区域内建模；视觉信号具有很强的局部相关性，这种设计已被证明十分有利 [36, 25, 41]。Swin Transformer 因而兼具效率与效果，在 COCO 目标检测和 ADE20K 语义分割上均取得当时最优精度。</p>
+<h2 id="方法">3 方法</h2>
+<h3 id="整体架构">3.1 整体架构</h3>
+<p>图 3 展示了 Swin Transformer 的整体架构，并以微型版本 Swin-T 为例。与 ViT 类似，模型首先通过图像块划分模块，把输入 RGB 图像切分为互不重叠的图像块。每个图像块视为一个 token，其特征由块内原始像素的 RGB 值拼接而成。本文采用 <span class="math inline">\(4 × 4\)</span> 的图像块分割，因此每个图像块的特征维度为 <span class="math inline">\(4 × 4 × 3 = 48\)</span>。线性嵌入层随后把原始像素特征投影到任意维度 <span class="math inline">\(C\)</span>。</p>
+<p>模型对这些图像块 token 依次应用若干采用改进自注意力的 Transformer 块，即 Swin Transformer 块。它们保持 token 数量 <span class="math inline">\(\dfrac{H}{4} × \dfrac{W}{4}\)</span> 不变，与线性嵌入层共同构成“Stage 1”。</p>
+<p>为形成层级表征，网络越深，图像块合并层（Patch Merging Layer）就会逐步减少 token 数量。第一个图像块合并层拼接每组 <span class="math inline">\(2 × 2\)</span> 个相邻图像块的特征，再对拼接后的 <span class="math inline">\(4C\)</span> 维特征应用线性层。这样，token 数减少到原来的四分之一，特征图分辨率下采样 2 倍，线性层输出维度设为 <span class="math inline">\(2C\)</span>。</p>
+<p>随后使用 Swin Transformer 块变换特征，并将分辨率保持为 <span class="math inline">\(\dfrac{H}{8} × \dfrac{W}{8}\)</span>。这一组图像块合并和特征变换组成“Stage 2”。同样的过程再重复两次，构成“Stage 3”和“Stage 4”，输出分辨率分别为 <span class="math inline">\(\dfrac{H}{16} × \dfrac{W}{16}\)</span> 和 <span class="math inline">\(\dfrac{H}{32} × \dfrac{W}{32}\)</span>。</p>
+<p>这些阶段共同产生层级表征，其特征图分辨率与 VGG [52]、ResNet [30] 等典型卷积网络一致。因此，Swin Transformer 可以方便地替换现有方法中的骨干网络，用于多种视觉任务。 <img src="/2026/08/28/Swin%20Transformer%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/figure-3.png" srcset="/img/loading.gif" lazyload class="" title="图 3：（a）Swin Transformer（Swin-T）的架构；（b）两个连续的 Swin Transformer 块，其符号定义见式（3）。W-MSA 与 SW-MSA 分别表示采用常规窗口和移位窗口划分的窗口多头自注意力模块"></p>
+<h4 id="swin-transformer-块">Swin Transformer 块</h4>
+<p>Swin Transformer 用基于移位窗口的模块替换标准 Transformer 块中的多头自注意力（Multi-head Self-Attention，MSA），其余层保持不变。移位窗口模块将在第 3.2 节详述。如图 3(b) 所示，一个 Swin Transformer 块先执行基于移位窗口的 MSA，随后接一个两层 MLP，MLP 中间使用 GELU 非线性激活。每个 MSA 模块和 MLP 之前都使用层归一化（Layer Normalization，LN），每个模块之后均接残差连接。</p>
+<h3 id="基于移位窗口的自注意力">3.2 基于移位窗口的自注意力</h3>
+<p>标准 Transformer [64] 及其图像分类版本 [20] 都采用全局自注意力，即计算每个 token 与所有其他 token 之间的关系。其计算复杂度相对于 token 数量呈二次增长，因此不适合需要大量 token 的视觉任务，例如密集预测或高分辨率图像表征。</p>
+<h4 id="在互不重叠的窗口内计算自注意力-self-attention-in-non-overlapped-windows">在互不重叠的窗口内计算自注意力 Self-attention in non-overlapped windows</h4>
+<p>为提高建模效率，我们只在局部窗口内计算自注意力。这些窗口以互不重叠的方式均匀划分图像。设每个窗口包含 <span class="math inline">\(M × M\)</span> 个图像块，则对于包含 <span class="math inline">\(h × w\)</span> 个图像块的图像，全局 MSA 和窗口 MSA 的计算复杂度³分别为： <span class="math display">\[ \Omega(\text{MSA}) = 4hwC^2 + 2(hw)^2C \quad (1)\]</span> <span class="math display">\[ \Omega(\text{W-MSA}) = 4hwC^2 + 2M^2hwC \quad(2)\]</span> 前者相对于图像块数量 <span class="math inline">\(hw\)</span> 呈二次增长；后者在 <span class="math inline">\(M\)</span> 固定时呈线性增长，本文默认 <span class="math inline">\(M = 7\)</span>。当 <span class="math inline">\(hw\)</span> 很大时，全局自注意力通常难以承受，而窗口自注意力仍具有良好的可扩展性。</p>
+<blockquote>
+<p>³ 计算复杂度时省略 SoftMax。 <strong>公式推算</strong>：<span class="math inline">\(a\times b\)</span> 矩阵与 <span class="math inline">\(b\times c\)</span> 矩阵相乘，需要 <span class="math inline">\(abc\)</span> 次乘法。</p>
+<ol type="1">
+<li>标准的多头自注意力：<span class="math inline">\(\Omega(\text{MSA}) = 4hwC^2 + 2(hw)^2C\)</span></li>
+</ol>
+<ul>
+<li>首先，<code>x → qkv</code>是 <span class="math inline">\(hw\times C\)</span> 向量 <span class="math inline">\(x\)</span> 分别乘以 <span class="math inline">\(3\)</span> 个 <span class="math inline">\(C\times C\)</span> 系数矩阵 <span class="math inline">\(W_Q、W_K、W_V\)</span>，每个计算的复杂度是 <span class="math inline">\(hwC^2\)</span>， <span class="math inline">\(3\)</span> 次操作贡献复杂度 <span class="math inline">\(3hwC^2\)</span></li>
+<li>然后，计算自注意力矩阵 <code>attn = q @ k.T</code> 是 <span class="math inline">\(hw\times C\)</span> 矩阵与 <span class="math inline">\(C\times hw\)</span> 矩阵相乘，贡献复杂度 <span class="math inline">\((hw)^2 C\)</span></li>
+<li>接下来，<code>attn @ v</code>是 <span class="math inline">\(hw\times hw\)</span> 方阵与 <span class="math inline">\(hw\times C\)</span> 向量相乘，贡献复杂度 <span class="math inline">\((hw)^2 C\)</span></li>
+<li>最后一步，线性投射层<code>x = self.proj(x)</code>是 <span class="math inline">\(hw\times C\)</span> 向量乘以 <span class="math inline">\(C\times C\)</span> 矩阵，贡献复杂度 <span class="math inline">\(hwC^2\)</span></li>
+</ul>
+<ol start="2" type="1">
+<li>基于窗口的自注意力：<span class="math inline">\(\Omega(\text{W-MSA}) = 4hwC^2 + 2M^2hwC\)</span></li>
+</ol>
+<ul>
+<li>自注意力的计算范围从 <span class="math inline">\(h\times w\)</span> 全图缩小到 <span class="math inline">\(M\times M\)</span> 的窗口，复杂度形式与 <span class="math inline">\(\Omega(\text{MSA})\)</span> 相同，贡献复杂度 <span class="math inline">\(\Omega = 4M^2C^2 + 2M^4C\)</span></li>
+<li>窗口数量 <span class="math inline">\(\dfrac{h}{M}\times \dfrac{w}{M}\)</span>，总复杂度为 <span class="math inline">\(\Omega(\text{W-MSA}) = \dfrac{h}{M}\times \dfrac{w}{M} \Omega = 4hwC^2 + 2M^2hwC\)</span></li>
+</ul>
+</blockquote>
+<h4 id="在连续网络块中划分移动窗口-shifted-window-partitioning-in-successive-blocks">在连续网络块中划分移动窗口 Shifted window partitioning in successive blocks</h4>
+<p>窗口自注意力只在各窗口内部计算，缺少跨窗口连接，因而限制了建模能力。为在保留非重叠窗口高效计算的同时建立跨窗口联系，我们提出移位窗口划分：相邻 Swin Transformer 块在两种划分配置之间交替。</p>
+<p>如图 2 所示，第一个模块采用从左上角开始的常规窗口划分，将 <span class="math inline">\(8 × 8\)</span> 特征图均匀分为 <span class="math inline">\(2 × 2\)</span> 个大小为 <span class="math inline">\(4 × 4\)</span> 的窗口，此时 <span class="math inline">\(M = 4\)</span>。下一模块采用相对于前一层移动的窗口划分，沿两个空间轴分别移动 <span class="math inline">\(⌊\dfrac{M}{2}⌋\)</span> 个像素。</p>
+<p>在这种划分方式下，连续两个 Swin Transformer 块的计算过程为： <span class="math display">\[ \hat{z}^l = \text{W-MSA}(\text{LN}(z^{l−1})) + z^{l−1} \]</span> <span class="math display">\[ z^l = \text{MLP}(\text{LN}(\hat{z}^l)) + \hat{z}^l \]</span> <span class="math display">\[ \hat{z}^{l+1} = \text{SW-MSA}(\text{LN}(z^l)) + z^l \]</span> <span class="math display">\[ z^{l+1} = \text{MLP}(\text{LN}(\hat{z}^{l+1})) + \hat{z}^{l+1} \quad (3) \]</span> 其中，<span class="math inline">\(\hat{z}^l\)</span> 和 <span class="math inline">\(z^l\)</span> 分别表示第 <span class="math inline">\(l\)</span> 个块中 (S)W-MSA 模块和 MLP 模块的输出；W-MSA 与 SW-MSA 分别表示采用常规窗口和移位窗口划分的窗口多头自注意力。</p>
+<p>移位窗口在前一层相邻且互不重叠的窗口之间建立连接。表 4 将证明，这一设计对图像分类、目标检测和语义分割均有效。</p>
+<h4 id="移位窗口自注意力的高效批量计算">移位窗口自注意力的高效批量计算</h4>
+<p>移位窗口划分会增加窗口数量：由 <span class="math inline">\(⌈\dfrac{h}{M}⌉ \times ⌈\dfrac{w}{M}⌉\)</span> 变为 <span class="math inline">\((⌈\dfrac{h}{M}⌉+1) \times (⌈\dfrac{w}{M}⌉+1)\)</span>，而且其中一些窗口小于 <span class="math inline">\(M × M\)</span>⁴。一种直接方案是把小窗口填充到 <span class="math inline">\(M × M\)</span>，并在计算注意力时屏蔽填充值。当常规划分中的窗口数较少时，例如 <span class="math inline">\(2 × 2\)</span>，这种做法会显著增加计算量：窗口数从 <span class="math inline">\(2 × 2\)</span> 增至 <span class="math inline">\(3 × 3\)</span>，计算量达到原来的 2.25 倍。</p>
+<blockquote>
+<p>⁴ 若窗口尺寸 <span class="math inline">\((M, M)\)</span> 不能整除特征图尺寸 <span class="math inline">\((h, w)\)</span>，则在特征图右侧和底部进行填充。</p>
+</blockquote>
+<p>本文提出一种更高效的批量计算方法，如图 4 所示：先把特征图<mark>循环移动</mark>到左上方。移动后，一个批处理窗口可能由特征图中互不相邻的多个子窗口组成，因此使用<mark>掩码</mark>，把自注意力限制在各子窗口内部。循环移位后，批处理窗口的数量与常规窗口划分保持一致，因而依然高效。表 5 给出了该方法的低延迟表现。</p>
+<p>关于这里采用的<mark>自注意力掩码</mark>结合源代码的详细讲解，请见“4. DeepWiki Q&amp;A with Code Context for Repository Swin-Transformer”。 <img src="/2026/08/28/Swin%20Transformer%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/figure-4.png" srcset="/img/loading.gif" lazyload class="" title="图 4：移位窗口划分中自注意力的高效批量计算方法"></p>
+<h4 id="相对位置偏置">相对位置偏置</h4>
+<p>参照文献 [49, 1, 32, 33]，本文在每个注意力头的相似度计算中加入相对位置偏置 <span class="math inline">\(B \in ℝ^{M^2 \times M^2}\)</span>： <span class="math display">\[ Attention(Q,K,V) =\text{SoftMax}(\dfrac{Q K^T}{\sqrt{d}}+B)\cdot V \quad (4)\]</span> 其中，<span class="math inline">\(Q, K, V \in ℝ^{M^2 \times d}\)</span> 分别是查询、键和值矩阵；<span class="math inline">\(d\)</span> 为查询/键的维度；<span class="math inline">\(M^2\)</span> 是窗口中的图像块数量。沿每个空间轴的相对位置取值范围为 <span class="math inline">\([−M+1, M−1]\)</span>，因此只需参数化一个较小的偏置矩阵 <span class="math inline">\(\hat{B} \in ℝ^{(2M−1)\times (2M−1)}\)</span>，再从 <span class="math inline">\(\hat{B}\)</span> 中索引得到 <span class="math inline">\(B\)</span>。</p>
+<p>表 4 显示，相比不使用该偏置或采用绝对位置嵌入的模型，相对位置偏置带来显著提升。若像 ViT [20] 那样在输入中进一步加入绝对位置嵌入，性能反而略有下降，因此本文不采用这种做法。预训练得到的相对位置偏置还可通过双三次插值 [20, 63]，用于初始化不同窗口尺寸的微调模型。</p>
+<p>关于这里采用的<mark>相对位置编码</mark>结合源代码的详细讲解，请见“4. DeepWiki Q&amp;A with Code Context for Repository Swin-Transformer”。 ### 3.3 架构变体</p>
+<p>基础模型 Swin-B 的规模与计算复杂度与 ViT-B/DeiT-B 相近。本文还构建了 Swin-T、Swin-S 和 Swin-L，其模型规模与计算复杂度分别约为基础模型的 0.25、0.5 和 2 倍。Swin-T 与 Swin-S 的复杂度分别与 ResNet-50（DeiT-S）和 ResNet-101 接近。所有实验默认窗口尺寸 <span class="math inline">\(M = 7\)</span>，每个注意力头的查询维度 <span class="math inline">\(d = 32\)</span>，MLP 扩展率 <span class="math inline">\(\alpha = 4\)</span>。各变体的超参数如下：</p>
+<ul>
+<li><strong>Swin-T：</strong> <span class="math inline">\(C = 96\)</span>，各阶段层数为 <span class="math inline">\(\{2, 2, 6, 2\}\)</span>；</li>
+<li><strong>Swin-S：</strong> <span class="math inline">\(C = 96\)</span>，各阶段层数为 <span class="math inline">\(\{2, 2, 18, 2\}\)</span>；</li>
+<li><strong>Swin-B：</strong> <span class="math inline">\(C = 128\)</span>，各阶段层数为 <span class="math inline">\(\{2, 2, 18, 2\}\)</span>；</li>
+<li><strong>Swin-L：</strong> <span class="math inline">\(C = 192\)</span>，各阶段层数为 <span class="math inline">\(\{2, 2, 18, 2\}\)</span>。</li>
+</ul>
+<p>其中，<span class="math inline">\(C\)</span> 是第一阶段隐藏层的通道数。各变体在 ImageNet 图像分类中的模型规模、理论计算复杂度和吞吐量见表 1。</p>
+<h2 id="实验">4 实验</h2>
+<p>我们在 ImageNet-1K 图像分类 [19]、COCO 目标检测 [43] 和 ADE20K 语义分割 [83] 上进行实验。以下先比较 Swin Transformer 与三项任务上的当前最优方法，再消融其关键设计。</p>
+<h3 id="imagenet-1k-图像分类">4.1 ImageNet-1K 图像分类</h3>
+<h4 id="实验设置">实验设置</h4>
+<p>ImageNet-1K [19] 包含 128 万张训练图像和 5 万张验证图像，共 1,000 个类别。本文报告单裁剪 top-1 准确率，并考虑两种训练设置。</p>
+<ul>
+<li><p><strong>常规 ImageNet-1K 训练。</strong> 设置基本沿用 DeiT [63]。使用 AdamW [37] 优化器训练 300 个 epoch，采用余弦衰减学习率和 20 个 epoch 的线性预热。批量大小为 1024，初始学习率为 0.001，权重衰减为 0.05。训练采用文献 [63] 中的大部分数据增强和正则化策略，但不使用重复增强 [31] 与指数移动平均（EMA）[45]，因为二者并未提升性能。这与 DeiT [63] 的观察不同；在 DeiT 中，重复增强对稳定 ViT 训练十分关键。</p></li>
+<li><p><strong>ImageNet-22K 预训练后在 ImageNet-1K 上微调。</strong> ImageNet-22K 包含 1,420 万张图像和 2.2 万个类别。预训练使用 AdamW 优化器，共 90 个 epoch，采用线性衰减学习率和 5 个 epoch 的线性预热。批量大小为 4096，初始学习率为 0.001，权重衰减为 0.01。在 ImageNet-1K 上微调时，训练 30 个 epoch，批量大小为 1024，学习率固定为 10<sup>−5</sup>，权重衰减为 10<sup>−8</sup>。</p></li>
+</ul>
+<h4 id="常规-imagenet-1k-训练结果">常规 ImageNet-1K 训练结果</h4>
+<p><strong>表 1(a)：</strong> 常规 ImageNet-1K 训练下不同骨干网络的比较。吞吐量按照文献 [63] 使用文献 [68] 的代码库和一张 V100 GPU 测量。</p>
+<table>
+<thead>
+<tr class="header">
+<th style="text-align: center;">方法</th>
+<th style="text-align: center;">输入尺寸</th>
+<th style="text-align: center;">参数量</th>
+<th style="text-align: center;">FLOPs</th>
+<th style="text-align: center;">吞吐量（图像/秒）</th>
+<th style="text-align: center;">ImageNet top-1</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;">RegNetY-4G [48]</td>
+<td style="text-align: center;">224²</td>
+<td style="text-align: center;">21M</td>
+<td style="text-align: center;">4.0G</td>
+<td style="text-align: center;">1156.7</td>
+<td style="text-align: center;">80.0</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">RegNetY-8G [48]</td>
+<td style="text-align: center;">224²</td>
+<td style="text-align: center;">39M</td>
+<td style="text-align: center;">8.0G</td>
+<td style="text-align: center;">591.6</td>
+<td style="text-align: center;">81.7</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">RegNetY-16G [48]</td>
+<td style="text-align: center;">224²</td>
+<td style="text-align: center;">84M</td>
+<td style="text-align: center;">16.0G</td>
+<td style="text-align: center;">334.7</td>
+<td style="text-align: center;">82.9</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">EffNet-B3 [58]</td>
+<td style="text-align: center;">300²</td>
+<td style="text-align: center;">12M</td>
+<td style="text-align: center;">1.8G</td>
+<td style="text-align: center;">732.1</td>
+<td style="text-align: center;">81.6</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">EffNet-B4 [58]</td>
+<td style="text-align: center;">380²</td>
+<td style="text-align: center;">19M</td>
+<td style="text-align: center;">4.2G</td>
+<td style="text-align: center;">349.4</td>
+<td style="text-align: center;">82.9</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">EffNet-B5 [58]</td>
+<td style="text-align: center;">456²</td>
+<td style="text-align: center;">30M</td>
+<td style="text-align: center;">9.9G</td>
+<td style="text-align: center;">169.1</td>
+<td style="text-align: center;">83.6</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">EffNet-B6 [58]</td>
+<td style="text-align: center;">528²</td>
+<td style="text-align: center;">43M</td>
+<td style="text-align: center;">19.0G</td>
+<td style="text-align: center;">96.9</td>
+<td style="text-align: center;">84.0</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">EffNet-B7 [58]</td>
+<td style="text-align: center;">600²</td>
+<td style="text-align: center;">66M</td>
+<td style="text-align: center;">37.0G</td>
+<td style="text-align: center;">55.1</td>
+<td style="text-align: center;">84.3</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">ViT-B/16 [20]</td>
+<td style="text-align: center;">384²</td>
+<td style="text-align: center;">86M</td>
+<td style="text-align: center;">55.4G</td>
+<td style="text-align: center;">85.9</td>
+<td style="text-align: center;">77.9</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">ViT-L/16 [20]</td>
+<td style="text-align: center;">384²</td>
+<td style="text-align: center;">307M</td>
+<td style="text-align: center;">190.7G</td>
+<td style="text-align: center;">27.3</td>
+<td style="text-align: center;">76.5</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">DeiT-S [63]</td>
+<td style="text-align: center;">224²</td>
+<td style="text-align: center;">22M</td>
+<td style="text-align: center;">4.6G</td>
+<td style="text-align: center;">940.4</td>
+<td style="text-align: center;">79.8</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">DeiT-B [63]</td>
+<td style="text-align: center;">224²</td>
+<td style="text-align: center;">86M</td>
+<td style="text-align: center;">17.5G</td>
+<td style="text-align: center;">292.3</td>
+<td style="text-align: center;">81.8</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">DeiT-B [63]</td>
+<td style="text-align: center;">384²</td>
+<td style="text-align: center;">86M</td>
+<td style="text-align: center;">55.4G</td>
+<td style="text-align: center;">85.9</td>
+<td style="text-align: center;">83.1</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;"><strong>Swin-T</strong></td>
+<td style="text-align: center;"><strong>224²</strong></td>
+<td style="text-align: center;"><strong>29M</strong></td>
+<td style="text-align: center;"><strong>4.5G</strong></td>
+<td style="text-align: center;"><strong>755.2</strong></td>
+<td style="text-align: center;"><strong>81.3</strong></td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;"><strong>Swin-S</strong></td>
+<td style="text-align: center;"><strong>224²</strong></td>
+<td style="text-align: center;"><strong>50M</strong></td>
+<td style="text-align: center;"><strong>8.7G</strong></td>
+<td style="text-align: center;"><strong>436.9</strong></td>
+<td style="text-align: center;"><strong>83.0</strong></td>
+</tr>
+<tr class="even">
+<td style="text-align: center;"><strong>Swin-B</strong></td>
+<td style="text-align: center;"><strong>224²</strong></td>
+<td style="text-align: center;"><strong>88M</strong></td>
+<td style="text-align: center;"><strong>15.4G</strong></td>
+<td style="text-align: center;"><strong>278.1</strong></td>
+<td style="text-align: center;"><strong>83.5</strong></td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;"><strong>Swin-B</strong></td>
+<td style="text-align: center;"><strong>384²</strong></td>
+<td style="text-align: center;"><strong>88M</strong></td>
+<td style="text-align: center;"><strong>47.0G</strong></td>
+<td style="text-align: center;"><strong>84.7</strong></td>
+<td style="text-align: center;"><strong>84.5</strong></td>
+</tr>
+</tbody>
+</table>
+<p>与此前最优的 Transformer 架构 DeiT [63] 相比，复杂度相近的 Swin Transformer 明显更优：在 <em>224²</em> 输入下，Swin-T 的准确率为 81.3%，比 DeiT-S 的 79.8% 高 1.5 个百分点；Swin-B 在 <em>224²/384²</em> 输入下分别达到 83.5%/84.5%，比 DeiT-B 的 81.8%/83.1% 高约 1.5/1.4 个百分点。</p>
+<p>与 RegNet [48]、EfficientNet [58] 等当前最优卷积网络相比，Swin Transformer 也取得了略好的速度—精度权衡。值得注意的是，RegNet 和 EfficientNet 经过了大量架构搜索，而 Swin Transformer 只是从标准 Transformer 改造而来，仍有很大的改进空间。</p>
+<h4 id="imagenet-22k-预训练结果">ImageNet-22K 预训练结果</h4>
+<p><strong>表 1(b)：</strong> 使用 ImageNet-22K 预训练后，不同骨干网络在 ImageNet-1K 上的比较。</p>
+<table>
+<thead>
+<tr class="header">
+<th style="text-align: center;">方法</th>
+<th style="text-align: center;">输入尺寸</th>
+<th style="text-align: center;">参数量</th>
+<th style="text-align: center;">FLOPs</th>
+<th style="text-align: center;">吞吐量（图像/秒）</th>
+<th style="text-align: center;">ImageNet top-1</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;">R-101x3 [38]</td>
+<td style="text-align: center;">384²</td>
+<td style="text-align: center;">388M</td>
+<td style="text-align: center;">204.6G</td>
+<td style="text-align: center;">—</td>
+<td style="text-align: center;">84.4</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">R-152x4 [38]</td>
+<td style="text-align: center;">480²</td>
+<td style="text-align: center;">937M</td>
+<td style="text-align: center;">840.5G</td>
+<td style="text-align: center;">—</td>
+<td style="text-align: center;">85.4</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">ViT-B/16 [20]</td>
+<td style="text-align: center;">384²</td>
+<td style="text-align: center;">86M</td>
+<td style="text-align: center;">55.4G</td>
+<td style="text-align: center;">85.9</td>
+<td style="text-align: center;">84.0</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">ViT-L/16 [20]</td>
+<td style="text-align: center;">384²</td>
+<td style="text-align: center;">307M</td>
+<td style="text-align: center;">190.7G</td>
+<td style="text-align: center;">27.3</td>
+<td style="text-align: center;">85.2</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">Swin-B</td>
+<td style="text-align: center;">224²</td>
+<td style="text-align: center;">88M</td>
+<td style="text-align: center;">15.4G</td>
+<td style="text-align: center;">278.1</td>
+<td style="text-align: center;">85.2</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;"><strong>Swin-B</strong></td>
+<td style="text-align: center;"><strong>384²</strong></td>
+<td style="text-align: center;"><strong>88M</strong></td>
+<td style="text-align: center;"><strong>47.0G</strong></td>
+<td style="text-align: center;"><strong>84.7</strong></td>
+<td style="text-align: center;"><strong>86.4</strong></td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;"><strong>Swin-L</strong></td>
+<td style="text-align: center;"><strong>384²</strong></td>
+<td style="text-align: center;"><strong>197M</strong></td>
+<td style="text-align: center;"><strong>103.9G</strong></td>
+<td style="text-align: center;"><strong>42.1</strong></td>
+<td style="text-align: center;"><strong>87.3</strong></td>
+</tr>
+</tbody>
+</table>
+<p>较大容量的 Swin-B 和 Swin-L 在 ImageNet-22K 上预训练，再在 ImageNet-1K 上微调。ImageNet-22K 预训练使 Swin-B 相比从 ImageNet-1K 零开始训练提高 1.8–1.9 个百分点。与此前采用 ImageNet-22K 预训练的最好结果相比，Swin 模型取得了显著更优的速度—精度权衡：Swin-B 的 top-1 准确率为 86.4%，比推理吞吐量相近的 ViT 高 2.4 个百分点（84.7 对 85.9 图像/秒），FLOPs 还略低（47.0G 对 55.4G）。规模更大的 Swin-L 达到 87.3%，又比 Swin-B 高 0.9 个百分点。</p>
+<h3 id="coco-目标检测">4.2 COCO 目标检测</h3>
+<h4 id="实验设置-1">实验设置</h4>
+<p>目标检测和实例分割实验采用 COCO 2017，其中包含 11.8 万张训练图像、5,000 张验证图像和 2 万张 test-dev 图像。消融实验在验证集上进行，系统级比较在 test-dev 上报告。</p>
+<p>消融实验考虑 mmdetection [10] 中四种典型框架：Cascade Mask R-CNN [29, 6]、ATSS [79]、RepPoints v2 [12] 和 Sparse R-CNN [56]。四种框架使用相同设置：多尺度训练 [8, 56]，将输入短边缩放到 480–800、长边不超过 1333；AdamW [44] 优化器，初始学习率 0.0001、权重衰减 0.05、批量大小 16；采用 3× 训练计划，即 36 个 epoch。</p>
+<p>系统级比较使用改进的 HTC [9]，记作 HTC++。它采用 InstaBoost [22]、更强的多尺度训练 [7]、6× 训练计划（72 个 epoch）、Soft-NMS [5]，并用 ImageNet-22K 预训练模型初始化。</p>
+<p>比较时仅替换骨干网络，其他设置保持不变。Swin Transformer 和 ResNe(X)t 具有层级特征图，可直接用于上述全部框架；DeiT 只输出单一分辨率特征图，无法直接应用。为公平比较，我们按照文献 [81] 使用反卷积层为 DeiT 构建层级特征图。</p>
+<h4 id="不同检测框架">不同检测框架</h4>
+<p><strong>表 2(a)：</strong> 在不同框架中比较 ResNet-50 与 Swin-T。</p>
+<table>
+<thead>
+<tr class="header">
+<th style="text-align: center;">框架</th>
+<th style="text-align: center;">骨干网络</th>
+<th style="text-align: center;">AP<sup>box</sup></th>
+<th style="text-align: center;">AP<sup>box</sup><sub>50</sub></th>
+<th style="text-align: center;">AP<sup>box</sup><sub>75</sub></th>
+<th style="text-align: center;">参数量</th>
+<th style="text-align: center;">FLOPs</th>
+<th style="text-align: center;">FPS</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;">Cascade Mask R-CNN</td>
+<td style="text-align: center;">R-50</td>
+<td style="text-align: center;">46.3</td>
+<td style="text-align: center;">64.3</td>
+<td style="text-align: center;">50.5</td>
+<td style="text-align: center;">82M</td>
+<td style="text-align: center;">739G</td>
+<td style="text-align: center;">18.0</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">Cascade Mask R-CNN</td>
+<td style="text-align: center;"><strong>Swin-T</strong></td>
+<td style="text-align: center;"><strong>50.5</strong></td>
+<td style="text-align: center;"><strong>69.3</strong></td>
+<td style="text-align: center;"><strong>54.9</strong></td>
+<td style="text-align: center;">86M</td>
+<td style="text-align: center;">745G</td>
+<td style="text-align: center;">15.3</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">ATSS</td>
+<td style="text-align: center;">R-50</td>
+<td style="text-align: center;">43.5</td>
+<td style="text-align: center;">61.9</td>
+<td style="text-align: center;">47.0</td>
+<td style="text-align: center;">32M</td>
+<td style="text-align: center;">205G</td>
+<td style="text-align: center;">28.3</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">ATSS</td>
+<td style="text-align: center;"><strong>Swin-T</strong></td>
+<td style="text-align: center;"><strong>47.2</strong></td>
+<td style="text-align: center;"><strong>66.5</strong></td>
+<td style="text-align: center;"><strong>51.3</strong></td>
+<td style="text-align: center;">36M</td>
+<td style="text-align: center;">215G</td>
+<td style="text-align: center;">22.3</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">RepPointsV2</td>
+<td style="text-align: center;">R-50</td>
+<td style="text-align: center;">46.5</td>
+<td style="text-align: center;">64.6</td>
+<td style="text-align: center;">50.3</td>
+<td style="text-align: center;">42M</td>
+<td style="text-align: center;">274G</td>
+<td style="text-align: center;">13.6</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">RepPointsV2</td>
+<td style="text-align: center;"><strong>Swin-T</strong></td>
+<td style="text-align: center;"><strong>50.0</strong></td>
+<td style="text-align: center;"><strong>68.5</strong></td>
+<td style="text-align: center;"><strong>54.2</strong></td>
+<td style="text-align: center;">45M</td>
+<td style="text-align: center;">283G</td>
+<td style="text-align: center;">12.0</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">Sparse R-CNN</td>
+<td style="text-align: center;">R-50</td>
+<td style="text-align: center;">44.5</td>
+<td style="text-align: center;">63.4</td>
+<td style="text-align: center;">48.2</td>
+<td style="text-align: center;">106M</td>
+<td style="text-align: center;">166G</td>
+<td style="text-align: center;">21.0</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">Sparse R-CNN</td>
+<td style="text-align: center;"><strong>Swin-T</strong></td>
+<td style="text-align: center;"><strong>47.9</strong></td>
+<td style="text-align: center;"><strong>67.3</strong></td>
+<td style="text-align: center;"><strong>52.3</strong></td>
+<td style="text-align: center;">110M</td>
+<td style="text-align: center;">172G</td>
+<td style="text-align: center;">18.4</td>
+</tr>
+</tbody>
+</table>
+<p>Swin-T 在四种检测框架中始终比 ResNet-50 高 3.4–4.2 box AP，而模型规模、FLOPs 和延迟仅略有增加。</p>
+<h4 id="不同骨干网络">不同骨干网络</h4>
+<p><strong>表 2(b)：</strong> 在 Cascade Mask R-CNN 中比较不同骨干网络。† 表示使用额外反卷积层生成层级特征图。</p>
+<table>
+<thead>
+<tr class="header">
+<th style="text-align: center;">骨干网络</th>
+<th style="text-align: center;">AP<sup>box</sup></th>
+<th style="text-align: center;">AP<sup>box</sup><sub>50</sub></th>
+<th style="text-align: center;">AP<sup>box</sup><sub>75</sub></th>
+<th style="text-align: center;">AP<sup>mask</sup></th>
+<th style="text-align: center;">AP<sup>mask</sup><sub>50</sub></th>
+<th style="text-align: center;">AP<sup>mask</sup><sub>75</sub></th>
+<th style="text-align: center;">参数量</th>
+<th style="text-align: center;">FLOPs</th>
+<th style="text-align: center;">FPS</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;">DeiT-S†</td>
+<td style="text-align: center;">48.0</td>
+<td style="text-align: center;">67.2</td>
+<td style="text-align: center;">51.7</td>
+<td style="text-align: center;">41.4</td>
+<td style="text-align: center;">64.2</td>
+<td style="text-align: center;">44.3</td>
+<td style="text-align: center;">80M</td>
+<td style="text-align: center;">889G</td>
+<td style="text-align: center;">10.4</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">R50</td>
+<td style="text-align: center;">46.3</td>
+<td style="text-align: center;">64.3</td>
+<td style="text-align: center;">50.5</td>
+<td style="text-align: center;">40.1</td>
+<td style="text-align: center;">61.7</td>
+<td style="text-align: center;">43.4</td>
+<td style="text-align: center;">82M</td>
+<td style="text-align: center;">739G</td>
+<td style="text-align: center;">18.0</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;"><strong>Swin-T</strong></td>
+<td style="text-align: center;"><strong>50.5</strong></td>
+<td style="text-align: center;"><strong>69.3</strong></td>
+<td style="text-align: center;"><strong>54.9</strong></td>
+<td style="text-align: center;"><strong>43.7</strong></td>
+<td style="text-align: center;"><strong>66.6</strong></td>
+<td style="text-align: center;"><strong>47.1</strong></td>
+<td style="text-align: center;">86M</td>
+<td style="text-align: center;">745G</td>
+<td style="text-align: center;">15.3</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">X101-32</td>
+<td style="text-align: center;">48.1</td>
+<td style="text-align: center;">66.5</td>
+<td style="text-align: center;">52.4</td>
+<td style="text-align: center;">41.6</td>
+<td style="text-align: center;">63.9</td>
+<td style="text-align: center;">45.2</td>
+<td style="text-align: center;">101M</td>
+<td style="text-align: center;">819G</td>
+<td style="text-align: center;">12.8</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;"><strong>Swin-S</strong></td>
+<td style="text-align: center;"><strong>51.8</strong></td>
+<td style="text-align: center;"><strong>70.4</strong></td>
+<td style="text-align: center;"><strong>56.3</strong></td>
+<td style="text-align: center;"><strong>44.7</strong></td>
+<td style="text-align: center;"><strong>67.9</strong></td>
+<td style="text-align: center;"><strong>48.5</strong></td>
+<td style="text-align: center;">107M</td>
+<td style="text-align: center;">838G</td>
+<td style="text-align: center;">12.0</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">X101-64</td>
+<td style="text-align: center;">48.3</td>
+<td style="text-align: center;">66.4</td>
+<td style="text-align: center;">52.3</td>
+<td style="text-align: center;">41.7</td>
+<td style="text-align: center;">64.0</td>
+<td style="text-align: center;">45.1</td>
+<td style="text-align: center;">140M</td>
+<td style="text-align: center;">972G</td>
+<td style="text-align: center;">10.4</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;"><strong>Swin-B</strong></td>
+<td style="text-align: center;"><strong>51.9</strong></td>
+<td style="text-align: center;"><strong>70.9</strong></td>
+<td style="text-align: center;"><strong>56.5</strong></td>
+<td style="text-align: center;"><strong>45.0</strong></td>
+<td style="text-align: center;"><strong>68.4</strong></td>
+<td style="text-align: center;"><strong>48.7</strong></td>
+<td style="text-align: center;">145M</td>
+<td style="text-align: center;">982G</td>
+<td style="text-align: center;">11.6</td>
+</tr>
+</tbody>
+</table>
+<p>在模型规模相近的情况下，Swin-B 达到 51.9 box AP 和 45.0 mask AP，比 ResNeXt101-64x4d 分别高 3.6 和 3.3 个百分点，FLOPs 与延迟相近。使用 Cascade Mask R-CNN 时，Swin-T 也比规模相近的 DeiT-S 高 2.5 box AP 和 2.3 mask AP，并且推理速度显著更快（15.3 对 10.4 FPS）。DeiT 的速度较低，主要源于其计算复杂度相对于输入图像尺寸呈二次增长。</p>
+<h4 id="系统级比较">系统级比较</h4>
+<p><strong>表 2(c)：</strong> COCO 目标检测与实例分割的系统级比较。* 表示使用多尺度测试。</p>
+<table>
+<thead>
+<tr class="header">
+<th style="text-align: center;">方法</th>
+<th style="text-align: center;">Mini-val AP<sup>box</sup></th>
+<th style="text-align: center;">Mini-val AP<sup>mask</sup></th>
+<th style="text-align: center;">Test-dev AP<sup>box</sup></th>
+<th style="text-align: center;">Test-dev AP<sup>mask</sup></th>
+<th style="text-align: center;">参数量</th>
+<th style="text-align: center;">FLOPs</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;">RepPointsV2* [12]</td>
+<td style="text-align: center;">—</td>
+<td style="text-align: center;">—</td>
+<td style="text-align: center;">52.1</td>
+<td style="text-align: center;">—</td>
+<td style="text-align: center;">—</td>
+<td style="text-align: center;">—</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">GCNet* [7]</td>
+<td style="text-align: center;">51.8</td>
+<td style="text-align: center;">44.7</td>
+<td style="text-align: center;">52.3</td>
+<td style="text-align: center;">45.4</td>
+<td style="text-align: center;">—</td>
+<td style="text-align: center;">1041G</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">RelationNet++* [13]</td>
+<td style="text-align: center;">—</td>
+<td style="text-align: center;">—</td>
+<td style="text-align: center;">52.7</td>
+<td style="text-align: center;">—</td>
+<td style="text-align: center;">—</td>
+<td style="text-align: center;">—</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">SpineNet-190 [21]</td>
+<td style="text-align: center;">52.6</td>
+<td style="text-align: center;">—</td>
+<td style="text-align: center;">52.8</td>
+<td style="text-align: center;">—</td>
+<td style="text-align: center;">164M</td>
+<td style="text-align: center;">1885G</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">ResNeSt-200* [78]</td>
+<td style="text-align: center;">52.5</td>
+<td style="text-align: center;">—</td>
+<td style="text-align: center;">53.3</td>
+<td style="text-align: center;">47.1</td>
+<td style="text-align: center;">—</td>
+<td style="text-align: center;">—</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">EfficientDet-D7 [59]</td>
+<td style="text-align: center;">54.4</td>
+<td style="text-align: center;">—</td>
+<td style="text-align: center;">55.1</td>
+<td style="text-align: center;">—</td>
+<td style="text-align: center;">77M</td>
+<td style="text-align: center;">410G</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">DetectoRS* [46]</td>
+<td style="text-align: center;">—</td>
+<td style="text-align: center;">—</td>
+<td style="text-align: center;">55.7</td>
+<td style="text-align: center;">48.5</td>
+<td style="text-align: center;">—</td>
+<td style="text-align: center;">—</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">YOLOv4 P7* [4]</td>
+<td style="text-align: center;">—</td>
+<td style="text-align: center;">—</td>
+<td style="text-align: center;">55.8</td>
+<td style="text-align: center;">—</td>
+<td style="text-align: center;">—</td>
+<td style="text-align: center;">—</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">Copy-paste [26]</td>
+<td style="text-align: center;">55.9</td>
+<td style="text-align: center;">47.2</td>
+<td style="text-align: center;">56.0</td>
+<td style="text-align: center;">47.4</td>
+<td style="text-align: center;">185M</td>
+<td style="text-align: center;">1440G</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">X101-64 (HTC++)</td>
+<td style="text-align: center;">52.3</td>
+<td style="text-align: center;">46.0</td>
+<td style="text-align: center;">—</td>
+<td style="text-align: center;">—</td>
+<td style="text-align: center;">155M</td>
+<td style="text-align: center;">1033G</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">Swin-B (HTC++)</td>
+<td style="text-align: center;">56.4</td>
+<td style="text-align: center;">49.1</td>
+<td style="text-align: center;">—</td>
+<td style="text-align: center;">—</td>
+<td style="text-align: center;">160M</td>
+<td style="text-align: center;">1043G</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">Swin-L (HTC++)</td>
+<td style="text-align: center;">57.1</td>
+<td style="text-align: center;">49.5</td>
+<td style="text-align: center;">57.7</td>
+<td style="text-align: center;">50.2</td>
+<td style="text-align: center;">284M</td>
+<td style="text-align: center;">1470G</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;"><strong>Swin-L (HTC++)</strong>*</td>
+<td style="text-align: center;"><strong>58.0</strong></td>
+<td style="text-align: center;"><strong>50.4</strong></td>
+<td style="text-align: center;"><strong>58.7</strong></td>
+<td style="text-align: center;"><strong>51.1</strong></td>
+<td style="text-align: center;">284M</td>
+<td style="text-align: center;">—</td>
+</tr>
+</tbody>
+</table>
+<p>在 52.3 box AP、46.0 mask AP 的较强 HTC++ 基线上，Swin Transformer 仍分别带来 4.1 box AP 和 3.1 mask AP 的提升。最佳模型在 COCO test-dev 上达到 58.7 box AP 和 51.1 mask AP，分别比此前最优结果高 2.7 个百分点（不使用外部数据的 Copy-paste [26]）和 2.6 个百分点（DetectoRS [46]）。</p>
+<p>在推理速度方面，ResNe(X)t 基于高度优化的 cuDNN 函数；本文架构使用 PyTorch 内置函数实现，其中部分算子尚未充分优化。全面的内核优化超出本文范围。</p>
+<h3 id="ade20k-语义分割">4.3 ADE20K 语义分割</h3>
+<h4 id="实验设置-2">实验设置</h4>
+<p>ADE20K [83] 是常用的语义分割数据集，覆盖 150 个语义类别，共 2.5 万张图像，其中 2 万张用于训练、2,000 张用于验证、3,000 张用于测试。本文使用 mmseg [16] 中高效的 UperNet [69] 作为基础框架，更多细节见附录。</p>
+<h4 id="结果">结果</h4>
+<p><strong>表 3：</strong> ADE20K 验证集与测试集上的语义分割结果。† 表示使用额外反卷积层生成层级特征图；‡ 表示模型在 ImageNet-22K 上预训练。</p>
+<table>
+<thead>
+<tr class="header">
+<th style="text-align: center;">方法</th>
+<th style="text-align: center;">骨干网络</th>
+<th style="text-align: center;">Val mIoU</th>
+<th style="text-align: center;">Test score</th>
+<th style="text-align: center;">参数量</th>
+<th style="text-align: center;">FLOPs</th>
+<th style="text-align: center;">FPS</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;">DANet [23]</td>
+<td style="text-align: center;">ResNet-101</td>
+<td style="text-align: center;">45.2</td>
+<td style="text-align: center;">—</td>
+<td style="text-align: center;">69M</td>
+<td style="text-align: center;">1119G</td>
+<td style="text-align: center;">15.2</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">DLab.v3+ [11]</td>
+<td style="text-align: center;">ResNet-101</td>
+<td style="text-align: center;">44.1</td>
+<td style="text-align: center;">—</td>
+<td style="text-align: center;">63M</td>
+<td style="text-align: center;">1021G</td>
+<td style="text-align: center;">16.0</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">ACNet [24]</td>
+<td style="text-align: center;">ResNet-101</td>
+<td style="text-align: center;">45.9</td>
+<td style="text-align: center;">38.5</td>
+<td style="text-align: center;">—</td>
+<td style="text-align: center;">—</td>
+<td style="text-align: center;">—</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">DNL [71]</td>
+<td style="text-align: center;">ResNet-101</td>
+<td style="text-align: center;">46.0</td>
+<td style="text-align: center;">56.2</td>
+<td style="text-align: center;">69M</td>
+<td style="text-align: center;">1249G</td>
+<td style="text-align: center;">14.8</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">OCRNet [73]</td>
+<td style="text-align: center;">ResNet-101</td>
+<td style="text-align: center;">45.3</td>
+<td style="text-align: center;">56.0</td>
+<td style="text-align: center;">56M</td>
+<td style="text-align: center;">923G</td>
+<td style="text-align: center;">19.3</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">UperNet [69]</td>
+<td style="text-align: center;">ResNet-101</td>
+<td style="text-align: center;">44.9</td>
+<td style="text-align: center;">—</td>
+<td style="text-align: center;">86M</td>
+<td style="text-align: center;">1029G</td>
+<td style="text-align: center;">20.1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">OCRNet [73]</td>
+<td style="text-align: center;">HRNet-w48</td>
+<td style="text-align: center;">45.7</td>
+<td style="text-align: center;">—</td>
+<td style="text-align: center;">71M</td>
+<td style="text-align: center;">664G</td>
+<td style="text-align: center;">12.5</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">DLab.v3+ [11]</td>
+<td style="text-align: center;">ResNeSt-101</td>
+<td style="text-align: center;">46.9</td>
+<td style="text-align: center;">55.1</td>
+<td style="text-align: center;">66M</td>
+<td style="text-align: center;">1051G</td>
+<td style="text-align: center;">11.9</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">DLab.v3+ [11]</td>
+<td style="text-align: center;">ResNeSt-200</td>
+<td style="text-align: center;">48.4</td>
+<td style="text-align: center;">—</td>
+<td style="text-align: center;">88M</td>
+<td style="text-align: center;">1381G</td>
+<td style="text-align: center;">8.1</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">SETR [81]</td>
+<td style="text-align: center;">T-Large‡</td>
+<td style="text-align: center;">50.3</td>
+<td style="text-align: center;">61.7</td>
+<td style="text-align: center;">308M</td>
+<td style="text-align: center;">—</td>
+<td style="text-align: center;">—</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">UperNet</td>
+<td style="text-align: center;">DeiT-S†</td>
+<td style="text-align: center;">44.0</td>
+<td style="text-align: center;">—</td>
+<td style="text-align: center;">52M</td>
+<td style="text-align: center;">1099G</td>
+<td style="text-align: center;">16.2</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">UperNet</td>
+<td style="text-align: center;">Swin-T</td>
+<td style="text-align: center;">46.1</td>
+<td style="text-align: center;">—</td>
+<td style="text-align: center;">60M</td>
+<td style="text-align: center;">945G</td>
+<td style="text-align: center;">18.5</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">UperNet</td>
+<td style="text-align: center;">Swin-S</td>
+<td style="text-align: center;">49.3</td>
+<td style="text-align: center;">—</td>
+<td style="text-align: center;">81M</td>
+<td style="text-align: center;">1038G</td>
+<td style="text-align: center;">15.2</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">UperNet</td>
+<td style="text-align: center;">Swin-B‡</td>
+<td style="text-align: center;">51.6</td>
+<td style="text-align: center;">—</td>
+<td style="text-align: center;">121M</td>
+<td style="text-align: center;">1841G</td>
+<td style="text-align: center;">8.7</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;"><strong>UperNet</strong></td>
+<td style="text-align: center;"><strong>Swin-L‡</strong></td>
+<td style="text-align: center;"><strong>53.5</strong></td>
+<td style="text-align: center;"><strong>62.8</strong></td>
+<td style="text-align: center;"><strong>234M</strong></td>
+<td style="text-align: center;"><strong>3230G</strong></td>
+<td style="text-align: center;"><strong>6.2</strong></td>
+</tr>
+</tbody>
+</table>
+<p>结果显示，在计算成本相近的情况下，Swin-S 比 DeiT-S 高 5.3 mIoU（49.3 对 44.0），比 ResNet-101 高 4.4 mIoU，比 ResNeSt-101 [78] 高 2.4 mIoU。采用 ImageNet-22K 预训练的 Swin-L 在验证集上达到 53.5 mIoU，比此前最佳的 SETR [81] 高 3.2 个百分点，而 SETR 的模型规模还更大。</p>
+<h3 id="消融实验">4.4 消融实验</h3>
+<p>消融实验覆盖 ImageNet-1K 图像分类、采用 Cascade Mask R-CNN 的 COCO 目标检测，以及采用 UperNet 的 ADE20K 语义分割。</p>
+<h4 id="移位窗口与位置编码">移位窗口与位置编码</h4>
+<p><strong>表 4：</strong> 使用 Swin-T，在三个基准上消融移位窗口与不同位置编码方法。“无移位”表示各阶段所有自注意力模块均采用常规窗口划分；“绝对位置”表示 ViT 的绝对位置嵌入；“相对位置”表示式（4）中的相对位置偏置；“无内容项”表示去除式（4）中第一个缩放点积项。</p>
+<table>
+<thead>
+<tr class="header">
+<th style="text-align: center;">设置</th>
+<th style="text-align: center;">ImageNet Top-1</th>
+<th style="text-align: center;">Top-5</th>
+<th style="text-align: center;">COCO AP<sup>box</sup></th>
+<th style="text-align: center;">AP<sup>mask</sup></th>
+<th style="text-align: center;">ADE20K mIoU</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;">无移位</td>
+<td style="text-align: center;">80.2</td>
+<td style="text-align: center;">95.1</td>
+<td style="text-align: center;">47.7</td>
+<td style="text-align: center;">41.5</td>
+<td style="text-align: center;">43.3</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;"><strong>移位窗口</strong></td>
+<td style="text-align: center;"><strong>81.3</strong></td>
+<td style="text-align: center;"><strong>95.6</strong></td>
+<td style="text-align: center;"><strong>50.5</strong></td>
+<td style="text-align: center;"><strong>43.7</strong></td>
+<td style="text-align: center;"><strong>46.1</strong></td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">无位置编码</td>
+<td style="text-align: center;">80.1</td>
+<td style="text-align: center;">94.9</td>
+<td style="text-align: center;">49.2</td>
+<td style="text-align: center;">42.6</td>
+<td style="text-align: center;">43.8</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">绝对位置</td>
+<td style="text-align: center;">80.5</td>
+<td style="text-align: center;">95.2</td>
+<td style="text-align: center;">49.0</td>
+<td style="text-align: center;">42.4</td>
+<td style="text-align: center;">43.2</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">绝对 + 相对位置</td>
+<td style="text-align: center;">81.3</td>
+<td style="text-align: center;">95.6</td>
+<td style="text-align: center;">50.2</td>
+<td style="text-align: center;">43.4</td>
+<td style="text-align: center;">44.0</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">相对位置，无内容项</td>
+<td style="text-align: center;">79.3</td>
+<td style="text-align: center;">94.7</td>
+<td style="text-align: center;">48.2</td>
+<td style="text-align: center;">41.9</td>
+<td style="text-align: center;">44.1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;"><strong>相对位置</strong></td>
+<td style="text-align: center;"><strong>81.3</strong></td>
+<td style="text-align: center;"><strong>95.6</strong></td>
+<td style="text-align: center;"><strong>50.5</strong></td>
+<td style="text-align: center;"><strong>43.7</strong></td>
+<td style="text-align: center;"><strong>46.1</strong></td>
+</tr>
+</tbody>
+</table>
+<p>移位窗口使 Swin-T 相比各阶段只采用一种窗口划分的模型，在 ImageNet-1K 上提高 1.1 个百分点，在 COCO 上提高 2.8 box AP 和 2.2 mask AP，在 ADE20K 上提高 2.8 mIoU。这说明移位窗口能有效连接前一层中的不同窗口。表 5 还显示，它带来的额外延迟很小。</p>
+<p>相对位置偏置相比无位置编码/绝对位置嵌入，在 ImageNet-1K 上分别提高 1.2/0.8 个百分点，在 COCO 上分别提高 1.3/1.5 box AP 和 1.1/1.3 mask AP，在 ADE20K 上分别提高 2.3/2.9 mIoU。值得注意的是，加入绝对位置嵌入虽然使图像分类准确率提高 0.4 个百分点，却损害目标检测和语义分割性能：COCO 的 box/mask AP 下降 0.2，ADE20K 的 mIoU 下降 0.6。</p>
+<p>近期 ViT/DeiT 在图像分类中放弃了平移不变性，尽管它长期以来一直被视为视觉建模的重要属性。本文结果表明，鼓励一定平移不变性的归纳偏置仍更适合通用视觉建模，尤其适合目标检测和语义分割等密集预测任务。</p>
+<h4 id="不同自注意力方法的实际速度">不同自注意力方法的实际速度</h4>
+<p><strong>表 5：</strong> 不同自注意力计算方法及实现方式在一张 V100 GPU 上的实际速度。</p>
+<table>
+<thead>
+<tr class="header">
+<th style="text-align: center;">方法</th>
+<th style="text-align: center;">阶段 1（ms）</th>
+<th style="text-align: center;">阶段 2</th>
+<th style="text-align: center;">阶段 3</th>
+<th style="text-align: center;">阶段 4</th>
+<th style="text-align: center;">Swin-T FPS</th>
+<th style="text-align: center;">Swin-S FPS</th>
+<th style="text-align: center;">Swin-B FPS</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;">滑动窗口（朴素实现）</td>
+<td style="text-align: center;">122.5</td>
+<td style="text-align: center;">38.3</td>
+<td style="text-align: center;">12.1</td>
+<td style="text-align: center;">7.6</td>
+<td style="text-align: center;">183</td>
+<td style="text-align: center;">109</td>
+<td style="text-align: center;">77</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">滑动窗口（内核实现）</td>
+<td style="text-align: center;">7.6</td>
+<td style="text-align: center;">4.7</td>
+<td style="text-align: center;">2.7</td>
+<td style="text-align: center;">1.8</td>
+<td style="text-align: center;">488</td>
+<td style="text-align: center;">283</td>
+<td style="text-align: center;">187</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">Performer[14]</td>
+<td style="text-align: center;">4.8</td>
+<td style="text-align: center;">2.8</td>
+<td style="text-align: center;">1.8</td>
+<td style="text-align: center;">1.5</td>
+<td style="text-align: center;">638</td>
+<td style="text-align: center;">370</td>
+<td style="text-align: center;">241</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">窗口（无移位）</td>
+<td style="text-align: center;">2.8</td>
+<td style="text-align: center;">1.7</td>
+<td style="text-align: center;">1.2</td>
+<td style="text-align: center;">0.9</td>
+<td style="text-align: center;">770</td>
+<td style="text-align: center;">444</td>
+<td style="text-align: center;">280</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">移位窗口（填充）</td>
+<td style="text-align: center;">3.3</td>
+<td style="text-align: center;">2.3</td>
+<td style="text-align: center;">1.9</td>
+<td style="text-align: center;">2.2</td>
+<td style="text-align: center;">670</td>
+<td style="text-align: center;">371</td>
+<td style="text-align: center;">236</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;"><strong>移位窗口（循环移位）</strong></td>
+<td style="text-align: center;"><strong>3.0</strong></td>
+<td style="text-align: center;"><strong>1.9</strong></td>
+<td style="text-align: center;"><strong>1.3</strong></td>
+<td style="text-align: center;"><strong>1.0</strong></td>
+<td style="text-align: center;"><strong>755</strong></td>
+<td style="text-align: center;"><strong>437</strong></td>
+<td style="text-align: center;"><strong>278</strong></td>
+</tr>
+</tbody>
+</table>
+<p>循环移位实现比朴素填充更适合硬件，尤其是在较深阶段。它使 Swin-T、Swin-S、Swin-B 的整体速度分别提高 13%、18% 和 18%。</p>
+<p>四个网络阶段中，移位窗口自注意力相对于滑动窗口的朴素实现/内核实现，分别快 40.8/2.5、20.2/2.5、9.3/2.1 和 7.6/1.8 倍。整体上，Swin-T、Swin-S、Swin-B 的移位窗口架构，相比滑动窗口架构的朴素实现/内核实现，分别快 4.1/1.5、4.0/1.5 和 3.6/1.5 倍。表 6 显示，两类方法的视觉建模精度相近。</p>
+<p><strong>表 6：</strong> Swin Transformer 使用不同自注意力方法时在三个基准上的准确率。</p>
+<table>
+<thead>
+<tr class="header">
+<th style="text-align: center;">方法</th>
+<th style="text-align: center;">骨干网络</th>
+<th style="text-align: center;">ImageNet Top-1</th>
+<th style="text-align: center;">Top-5</th>
+<th style="text-align: center;">COCO AP<sup>box</sup></th>
+<th style="text-align: center;">AP<sup>mask</sup></th>
+<th style="text-align: center;">ADE20K mIoU</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;">滑动窗口</td>
+<td style="text-align: center;">Swin-T</td>
+<td style="text-align: center;">81.4</td>
+<td style="text-align: center;">95.6</td>
+<td style="text-align: center;">50.2</td>
+<td style="text-align: center;">43.5</td>
+<td style="text-align: center;">45.8</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">Performer[14]</td>
+<td style="text-align: center;">Swin-T</td>
+<td style="text-align: center;">79.0</td>
+<td style="text-align: center;">94.2</td>
+<td style="text-align: center;">—</td>
+<td style="text-align: center;">—</td>
+<td style="text-align: center;">—</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;"><strong>移位窗口</strong></td>
+<td style="text-align: center;"><strong>Swin-T</strong></td>
+<td style="text-align: center;"><strong>81.3</strong></td>
+<td style="text-align: center;"><strong>95.6</strong></td>
+<td style="text-align: center;"><strong>50.5</strong></td>
+<td style="text-align: center;"><strong>43.7</strong></td>
+<td style="text-align: center;"><strong>46.1</strong></td>
+</tr>
+</tbody>
+</table>
+<p>Performer[14] 是速度最快的 Transformer 架构之一。本文的移位窗口自注意力及整体 Swin Transformer 架构仍略快于 Performer，并且在 Swin-T 的 ImageNet-1K 实验中高出 2.3 个百分点。</p>
+<h2 id="结论">5 结论</h2>
+<p>本文提出新的视觉 Transformer——Swin Transformer。它生成层级特征表征，计算复杂度相对于输入图像尺寸呈线性增长。Swin Transformer 在 COCO 目标检测和 ADE20K 语义分割上取得当时最优性能，并显著超过此前最佳方法。我们希望它在多种视觉问题上的良好表现，能推动视觉与语言信号的统一建模。</p>
+<p>移位窗口自注意力是 Swin Transformer 的核心。实验表明，它在视觉问题上既有效又高效。未来还值得研究其在自然语言处理中的应用。</p>
+<h2 id="致谢">致谢</h2>
+<p>感谢微软的许多同事提供帮助，尤其感谢 Li Dong 和 Furu Wei 的有益讨论，以及 Bin Xiao、Lu Yuan 和 Lei Zhang 在数据集方面的协助。</p>
+<h2 id="附录-a1-详细架构">附录 A1 详细架构</h2>
+<p>表 7 给出各模型的详细架构，假设输入图像尺寸均为 <em>224 × 224</em>。“拼接 <em>n × n</em>”表示拼接一个图像块中 <em>n × n</em> 个相邻特征，使特征图下采样 <em>n</em> 倍；“96-d”表示输出维度为 96 的线性层；“窗口 7 × 7”表示窗口尺寸为 <em>7 × 7</em> 的多头自注意力模块。</p>
+<p><strong>表 7：</strong> 详细架构规格。为便于阅读，原表按模型拆分如下。</p>
+<p><strong>Swin-T</strong></p>
+<table>
+<thead>
+<tr class="header">
+<th style="text-align: center;">阶段</th>
+<th style="text-align: center;">下采样率（输出尺寸）</th>
+<th style="text-align: center;">图像块操作</th>
+<th style="text-align: center;">Swin 块配置</th>
+<th style="text-align: center;">重复次数</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">4×（56×56）</td>
+<td style="text-align: center;">拼接 4×4，96-d，LN</td>
+<td style="text-align: center;">窗口 7×7，维度 96，3 个头</td>
+<td style="text-align: center;">2</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">2</td>
+<td style="text-align: center;">8×（28×28）</td>
+<td style="text-align: center;">拼接 2×2，192-d，LN</td>
+<td style="text-align: center;">窗口 7×7，维度 192，6 个头</td>
+<td style="text-align: center;">2</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">3</td>
+<td style="text-align: center;">16×（14×14）</td>
+<td style="text-align: center;">拼接 2×2，384-d，LN</td>
+<td style="text-align: center;">窗口 7×7，维度 384，12 个头</td>
+<td style="text-align: center;">6</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">4</td>
+<td style="text-align: center;">32×（7×7）</td>
+<td style="text-align: center;">拼接 2×2，768-d，LN</td>
+<td style="text-align: center;">窗口 7×7，维度 768，24 个头</td>
+<td style="text-align: center;">2</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Swin-S</strong></p>
+<table>
+<thead>
+<tr class="header">
+<th style="text-align: center;">阶段</th>
+<th style="text-align: center;">下采样率（输出尺寸）</th>
+<th style="text-align: center;">图像块操作</th>
+<th style="text-align: center;">Swin 块配置</th>
+<th style="text-align: center;">重复次数</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">4×（56×56）</td>
+<td style="text-align: center;">拼接 4×4，96-d，LN</td>
+<td style="text-align: center;">窗口 7×7，维度 96，3 个头</td>
+<td style="text-align: center;">2</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">2</td>
+<td style="text-align: center;">8×（28×28）</td>
+<td style="text-align: center;">拼接 2×2，192-d，LN</td>
+<td style="text-align: center;">窗口 7×7，维度 192，6 个头</td>
+<td style="text-align: center;">2</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">3</td>
+<td style="text-align: center;">16×（14×14）</td>
+<td style="text-align: center;">拼接 2×2，384-d，LN</td>
+<td style="text-align: center;">窗口 7×7，维度 384，12 个头</td>
+<td style="text-align: center;">18</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">4</td>
+<td style="text-align: center;">32×（7×7）</td>
+<td style="text-align: center;">拼接 2×2，768-d，LN</td>
+<td style="text-align: center;">窗口 7×7，维度 768，24 个头</td>
+<td style="text-align: center;">2</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Swin-B</strong></p>
+<table>
+<thead>
+<tr class="header">
+<th style="text-align: center;">阶段</th>
+<th style="text-align: center;">下采样率（输出尺寸）</th>
+<th style="text-align: center;">图像块操作</th>
+<th style="text-align: center;">Swin 块配置</th>
+<th style="text-align: center;">重复次数</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">4×（56×56）</td>
+<td style="text-align: center;">拼接 4×4，128-d，LN</td>
+<td style="text-align: center;">窗口 7×7，维度 128，4 个头</td>
+<td style="text-align: center;">2</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">2</td>
+<td style="text-align: center;">8×（28×28）</td>
+<td style="text-align: center;">拼接 2×2，256-d，LN</td>
+<td style="text-align: center;">窗口 7×7，维度 256，8 个头</td>
+<td style="text-align: center;">2</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">3</td>
+<td style="text-align: center;">16×（14×14）</td>
+<td style="text-align: center;">拼接 2×2，512-d，LN</td>
+<td style="text-align: center;">窗口 7×7，维度 512，16 个头</td>
+<td style="text-align: center;">18</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">4</td>
+<td style="text-align: center;">32×（7×7）</td>
+<td style="text-align: center;">拼接 2×2，1024-d，LN</td>
+<td style="text-align: center;">窗口 7×7，维度 1024，32 个头</td>
+<td style="text-align: center;">2</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Swin-L</strong></p>
+<table>
+<thead>
+<tr class="header">
+<th style="text-align: center;">阶段</th>
+<th style="text-align: center;">下采样率（输出尺寸）</th>
+<th style="text-align: center;">图像块操作</th>
+<th style="text-align: center;">Swin 块配置</th>
+<th style="text-align: center;">重复次数</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">4×（56×56）</td>
+<td style="text-align: center;">拼接 4×4，192-d，LN</td>
+<td style="text-align: center;">窗口 7×7，维度 192，6 个头</td>
+<td style="text-align: center;">2</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">2</td>
+<td style="text-align: center;">8×（28×28）</td>
+<td style="text-align: center;">拼接 2×2，384-d，LN</td>
+<td style="text-align: center;">窗口 7×7，维度 384，12 个头</td>
+<td style="text-align: center;">2</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">3</td>
+<td style="text-align: center;">16×（14×14）</td>
+<td style="text-align: center;">拼接 2×2，768-d，LN</td>
+<td style="text-align: center;">窗口 7×7，维度 768，24 个头</td>
+<td style="text-align: center;">18</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">4</td>
+<td style="text-align: center;">32×（7×7）</td>
+<td style="text-align: center;">拼接 2×2，1536-d，LN</td>
+<td style="text-align: center;">窗口 7×7，维度 1536，48 个头</td>
+<td style="text-align: center;">2</td>
+</tr>
+</tbody>
+</table>
+<h2 id="附录-a2-详细实验设置">附录 A2 详细实验设置</h2>
+<h3 id="a2.1-imagenet-1k-图像分类">A2.1 ImageNet-1K 图像分类</h3>
+<p>图像分类时，在最后阶段的输出特征图上应用全局平均池化，再接线性分类器。实验发现，这种策略与 ViT [20]、DeiT [63] 中额外增加一个类别 token 的策略精度相当。评估报告单裁剪 top-1 准确率。</p>
+<h4 id="常规-imagenet-1k-训练">常规 ImageNet-1K 训练</h4>
+<p>训练设置基本沿用 DeiT [63]。所有模型变体默认输入分辨率为 <em>224²</em>。对于 <em>384²</em> 等其他分辨率，为降低 GPU 消耗，我们在 <em>224²</em> 分辨率模型上微调，而不是从头训练。</p>
+<p>在 <em>224²</em> 输入下从头训练时，使用 AdamW [37] 优化器训练 300 个 epoch，采用余弦衰减学习率和 20 个 epoch 的线性预热。批量大小为 1024，初始学习率为 0.001，权重衰减为 0.05，并使用最大范数为 1 的梯度裁剪。训练采用 DeiT [63] 的大部分增强和正则化策略，包括 RandAugment [17]、Mixup [77]、CutMix [75]、随机擦除 [82] 和随机深度 [35]，但不使用无效的重复增强 [31] 和 EMA [45]。模型越大，随机深度率越高：Swin-T、Swin-S、Swin-B 分别为 0.2、0.3、0.5。</p>
+<p>在更高分辨率输入上微调时，使用 AdamW 优化器训练 30 个 epoch，学习率固定为 10<sup>−5</sup>，权重衰减为 10<sup>−8</sup>；数据增强和正则化与第一阶段相同，但随机深度率设为 0.1。</p>
+<h4 id="imagenet-22k-预训练">ImageNet-22K 预训练</h4>
+<p>ImageNet-22K 包含 1,420 万张图像和 2.2 万个类别，训练分两阶段进行。第一阶段输入为 <em>224²</em>，使用 AdamW 优化器训练 90 个 epoch，采用线性衰减学习率和 5 个 epoch 的线性预热。批量大小为 4096，初始学习率为 0.001，权重衰减为 0.01。第二阶段在 ImageNet-1K 上以 <em>224²/384²</em> 输入微调，训练 30 个 epoch，批量大小为 1024，学习率固定为 10<sup>−5</sup>，权重衰减为 10<sup>−8</sup>。</p>
+<h3 id="a2.2-coco-目标检测">A2.2 COCO 目标检测</h3>
+<p>消融实验采用 Cascade Mask R-CNN [29, 6]、ATSS [79]、RepPoints v2 [12] 和 Sparse R-CNN [56] 四种框架，均在 mmdetection [10] 中实现。统一设置为：多尺度训练 [8, 56]，输入短边在 480–800 之间、长边不超过 1333；AdamW [44] 优化器，初始学习率 0.0001、权重衰减 0.05、批量大小 16；采用 3× 训练计划，在第 27 和 33 个 epoch 将学习率降低 10 倍，总共训练 36 个 epoch。</p>
+<p>系统级比较采用改进的 HTC [9]，即 HTC++。它使用 InstaBoost [22]、更强的多尺度训练 [7]（输入短边 400–1400，长边不超过 1600）、6× 训练计划（72 个 epoch，在第 63 和 69 个 epoch 将学习率乘以 0.1）、Soft-NMS [5]，并在最后阶段输出后附加一个全局自注意力层。模型以 ImageNet-22K 预训练权重初始化。所有 Swin Transformer 模型的随机深度率均设为 0.2。</p>
+<h3 id="a2.3-ade20k-语义分割">A2.3 ADE20K 语义分割</h3>
+<p>ADE20K [83] 包含 2.5 万张图像，覆盖 150 个语义类别；其中 2 万张用于训练、2,000 张用于验证、3,000 张用于测试。本文采用 mmsegmentation [16] 中的 UperNet [69] 作为基础框架。</p>
+<p>训练使用 AdamW [44] 优化器，初始学习率为 6×10<sup>−5</sup>，权重衰减为 0.01；采用线性学习率衰减和 1,500 次迭代的线性预热。模型在 8 张 GPU 上训练 16 万次迭代，每张 GPU 放置 2 张图像。数据增强使用 mmsegmentation 默认设置，包括随机水平翻转、在 [0.5, 2.0] 范围内随机缩放，以及随机光度失真。所有 Swin Transformer 的随机深度率均设为 0.2。</p>
+<p>Swin-T 和 Swin-S 沿用已有方法的标准设置，输入尺寸为 <em>512 × 512</em>。标记 ‡ 的 Swin-B 和 Swin-L 在 ImageNet-22K 上预训练，输入尺寸为 <em>640 × 640</em>。推理采用多尺度测试，分辨率分别为训练尺寸的 [0.5, 0.75, 1.0, 1.25, 1.5, 1.75] 倍。报告测试集成绩时，按照惯例 [71] 同时使用训练集和验证集进行训练。</p>
+<h2 id="附录-a3-补充实验">附录 A3 补充实验</h2>
+<h3 id="a3.1-不同输入尺寸下的图像分类">A3.1 不同输入尺寸下的图像分类</h3>
+<p>表 8 列出输入尺寸从 <em>224²</em> 到 <em>384²</em> 时 Swin Transformer 的性能。总体而言，输入分辨率越高，top-1 准确率越高，但推理速度越慢。</p>
+<p><strong>表 8：</strong> 不同输入图像尺寸下，Swin Transformer 在 ImageNet-1K 分类上的性能。</p>
+<table>
+<thead>
+<tr class="header">
+<th style="text-align: center;">输入尺寸</th>
+<th style="text-align: center;">Swin-T Top-1</th>
+<th style="text-align: center;">吞吐量</th>
+<th style="text-align: center;">Swin-S Top-1</th>
+<th style="text-align: center;">吞吐量</th>
+<th style="text-align: center;">Swin-B Top-1</th>
+<th style="text-align: center;">吞吐量</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;">224²</td>
+<td style="text-align: center;">81.3</td>
+<td style="text-align: center;">755.2</td>
+<td style="text-align: center;">83.0</td>
+<td style="text-align: center;">436.9</td>
+<td style="text-align: center;">83.3</td>
+<td style="text-align: center;">278.1</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">256²</td>
+<td style="text-align: center;">81.6</td>
+<td style="text-align: center;">580.9</td>
+<td style="text-align: center;">83.4</td>
+<td style="text-align: center;">336.7</td>
+<td style="text-align: center;">83.7</td>
+<td style="text-align: center;">208.1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">320²</td>
+<td style="text-align: center;">82.1</td>
+<td style="text-align: center;">342.0</td>
+<td style="text-align: center;">83.7</td>
+<td style="text-align: center;">198.2</td>
+<td style="text-align: center;">84.0</td>
+<td style="text-align: center;">132.0</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">384²</td>
+<td style="text-align: center;">82.2</td>
+<td style="text-align: center;">219.5</td>
+<td style="text-align: center;">83.9</td>
+<td style="text-align: center;">127.6</td>
+<td style="text-align: center;">84.5</td>
+<td style="text-align: center;">84.7</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>吞吐量单位为图像/秒。</p>
+</blockquote>
+<h3 id="a3.2-resnext-在-coco-上使用不同优化器">A3.2 ResNe(X)t 在 COCO 上使用不同优化器</h3>
+<p>表 9 比较 Cascade Mask R-CNN 中 ResNe(X)t 骨干网络使用 SGD 和 AdamW 的结果。虽然 SGD 是该框架的默认优化器，但替换为 AdamW 通常能提高准确率，对较小的骨干网络尤其明显。因此，在与 Swin Transformer 比较时，本文为 ResNe(X)t 使用 AdamW。</p>
+<p><strong>表 9：</strong> ResNe(X)t 骨干网络在 COCO 目标检测中使用 SGD 与 AdamW 的比较。</p>
+<table>
+<thead>
+<tr class="header">
+<th style="text-align: center;">骨干网络</th>
+<th style="text-align: center;">优化器</th>
+<th style="text-align: center;">AP<sup>box</sup></th>
+<th style="text-align: center;">AP<sup>box</sup><sub>50</sub></th>
+<th style="text-align: center;">AP<sup>box</sup><sub>75</sub></th>
+<th style="text-align: center;">AP<sup>mask</sup></th>
+<th style="text-align: center;">AP<sup>mask</sup><sub>50</sub></th>
+<th style="text-align: center;">AP<sup>mask</sup><sub>75</sub></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;">R50</td>
+<td style="text-align: center;">SGD</td>
+<td style="text-align: center;">45.0</td>
+<td style="text-align: center;">62.9</td>
+<td style="text-align: center;">48.8</td>
+<td style="text-align: center;">38.5</td>
+<td style="text-align: center;">59.9</td>
+<td style="text-align: center;">41.4</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">R50</td>
+<td style="text-align: center;">AdamW</td>
+<td style="text-align: center;">46.3</td>
+<td style="text-align: center;">64.3</td>
+<td style="text-align: center;">50.5</td>
+<td style="text-align: center;">40.1</td>
+<td style="text-align: center;">61.7</td>
+<td style="text-align: center;">43.4</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">X101-32x4d</td>
+<td style="text-align: center;">SGD</td>
+<td style="text-align: center;">47.8</td>
+<td style="text-align: center;">65.9</td>
+<td style="text-align: center;">51.9</td>
+<td style="text-align: center;">40.4</td>
+<td style="text-align: center;">62.9</td>
+<td style="text-align: center;">43.5</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">X101-32x4d</td>
+<td style="text-align: center;">AdamW</td>
+<td style="text-align: center;">48.1</td>
+<td style="text-align: center;">66.5</td>
+<td style="text-align: center;">52.4</td>
+<td style="text-align: center;">41.6</td>
+<td style="text-align: center;">63.9</td>
+<td style="text-align: center;">45.2</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">X101-64x4d</td>
+<td style="text-align: center;">SGD</td>
+<td style="text-align: center;">48.8</td>
+<td style="text-align: center;">66.9</td>
+<td style="text-align: center;">53.0</td>
+<td style="text-align: center;">41.4</td>
+<td style="text-align: center;">63.9</td>
+<td style="text-align: center;">44.7</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">X101-64x4d</td>
+<td style="text-align: center;">AdamW</td>
+<td style="text-align: center;">48.3</td>
+<td style="text-align: center;">66.4</td>
+<td style="text-align: center;">52.3</td>
+<td style="text-align: center;">41.7</td>
+<td style="text-align: center;">64.0</td>
+<td style="text-align: center;">45.1</td>
+</tr>
+</tbody>
+</table>
+<h3 id="a3.3-swin-mlp-mixer">A3.3 Swin MLP-Mixer</h3>
+<p>我们把层级设计和移位窗口方法应用到 MLP-Mixer [61]，称为 Swin-Mixer。表 10 将其与原始 MLP-Mixer [61] 及后续的 ResMLP [62] 比较。Swin-Mixer 以略低的计算量（10.4G 对 12.7G）显著优于 MLP-Mixer（81.3% 对 76.4%），速度—精度权衡也优于 ResMLP。这说明本文的层级设计与移位窗口方法具有良好的通用性。</p>
+<p><strong>表 10：</strong> Swin MLP-Mixer 在 ImageNet-1K 分类上的性能。<em>D</em> 表示每个头的通道数；吞吐量使用文献 [68] 的代码库和一张 V100 GPU 测量。</p>
+<table>
+<thead>
+<tr class="header">
+<th style="text-align: center;">方法</th>
+<th style="text-align: center;">输入尺寸</th>
+<th style="text-align: center;">参数量</th>
+<th style="text-align: center;">FLOPs</th>
+<th style="text-align: center;">吞吐量（图像/秒）</th>
+<th style="text-align: center;">ImageNet Top-1</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;">MLP-Mixer-B/16 [61]</td>
+<td style="text-align: center;">224²</td>
+<td style="text-align: center;">59M</td>
+<td style="text-align: center;">12.7G</td>
+<td style="text-align: center;">—</td>
+<td style="text-align: center;">76.4</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">ResMLP-S24 [62]</td>
+<td style="text-align: center;">224²</td>
+<td style="text-align: center;">30M</td>
+<td style="text-align: center;">6.0G</td>
+<td style="text-align: center;">715</td>
+<td style="text-align: center;">79.4</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">ResMLP-B24 [62]</td>
+<td style="text-align: center;">224²</td>
+<td style="text-align: center;">116M</td>
+<td style="text-align: center;">23.0G</td>
+<td style="text-align: center;">231</td>
+<td style="text-align: center;">81.0</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">Swin-T/D24（Transformer）</td>
+<td style="text-align: center;">256²</td>
+<td style="text-align: center;">28M</td>
+<td style="text-align: center;">5.9G</td>
+<td style="text-align: center;">563</td>
+<td style="text-align: center;">81.6</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">Swin-Mixer-T/D24</td>
+<td style="text-align: center;">256²</td>
+<td style="text-align: center;">20M</td>
+<td style="text-align: center;">4.0G</td>
+<td style="text-align: center;">807</td>
+<td style="text-align: center;">79.4</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">Swin-Mixer-T/D12</td>
+<td style="text-align: center;">256²</td>
+<td style="text-align: center;">21M</td>
+<td style="text-align: center;">4.0G</td>
+<td style="text-align: center;">792</td>
+<td style="text-align: center;">79.6</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">Swin-Mixer-T/D6</td>
+<td style="text-align: center;">256²</td>
+<td style="text-align: center;">23M</td>
+<td style="text-align: center;">4.0G</td>
+<td style="text-align: center;">766</td>
+<td style="text-align: center;">79.7</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">Swin-Mixer-B/D24（无移位）</td>
+<td style="text-align: center;">224²</td>
+<td style="text-align: center;">61M</td>
+<td style="text-align: center;">10.4G</td>
+<td style="text-align: center;">409</td>
+<td style="text-align: center;">80.3</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;"><strong>Swin-Mixer-B/D24</strong></td>
+<td style="text-align: center;"><strong>224²</strong></td>
+<td style="text-align: center;"><strong>61M</strong></td>
+<td style="text-align: center;"><strong>10.4G</strong></td>
+<td style="text-align: center;"><strong>409</strong></td>
+<td style="text-align: center;"><strong>81.3</strong></td>
+</tr>
+</tbody>
+</table>
+<h2 id="参考文献">参考文献</h2>
+<blockquote>
+<p>为保持引文检索准确性，以下条目沿用原文语言与书目信息。</p>
+</blockquote>
+<p>[1] Hangbo Bao, Li Dong, Furu Wei, Wenhui Wang, Nan Yang, Xiaodong Liu, Yu Wang, Jianfeng Gao, Songhao Piao, Ming Zhou, et al. Unilmv2: Pseudo-masked language models for unified language model pre-training. In International Conference on Machine Learning, pages 642-652. PMLR, 2020.</p>
+<p>[2] Josh Beal, Eric Kim, Eric Tzeng, Dong Huk Park, Andrew Zhai, and Dmitry Kislyuk. Toward transformer-based object detection. arXiv preprint arXiv:2012.09958, 2020.</p>
+<p>[3] Irwan Bello, Barret Zoph, Ashish Vaswani, Jonathon Shlens, and Quoc V. Le. Attention augmented convolutional networks, 2020.</p>
+<p>[4] Alexey Bochkovskiy, Chien-Yao Wang, and Hong-Yuan Mark Liao. Yolov4: Optimal speed and accuracy of object detection. arXiv preprint arXiv:2004.10934, 2020.</p>
+<p>[5] Navaneeth Bodla, Bharat Singh, Rama Chellappa, and Larry S. Davis. Soft-nms - improving object detection with one line of code. In Proceedings of the IEEE International Conference on Computer Vision (ICCV), Oct 2017.</p>
+<p>[6] Zhaowei Cai and Nuno Vasconcelos. Cascade r-cnn: Delving into high quality object detection. In Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition, pages 6154-6162, 2018.</p>
+<p>[7] Yue Cao, Jiarui Xu, Stephen Lin, Fangyun Wei, and Han Hu. Gcnet: Non-local networks meet squeeze-excitation networks and beyond. In Proceedings of the IEEE/CVF International Conference on Computer Vision (ICCV) Workshops, Oct 2019.</p>
+<p>[8] Nicolas Carion, Francisco Massa, Gabriel Synnaeve, Nicolas Usunier, Alexander Kirillov, and Sergey Zagoruyko. End-to-end object detection with transformers. In European Conference on Computer Vision, pages 213-229. Springer, 2020.</p>
+<p>[9] Kai Chen, Jiangmiao Pang, Jiaqi Wang, Yu Xiong, Xiaoxiao Li, Shuyang Sun, Wansen Feng, Ziwei Liu, Jianping Shi, Wanli Ouyang, et al. Hybrid task cascade for instance segmentation. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition, pages 4974-4983, 2019.</p>
+<p>[10] Kai Chen, Jiaqi Wang, Jiangmiao Pang, Yuhang Cao, Yu Xiong, Xiaoxiao Li, Shuyang Sun, Wansen Feng, Ziwei Liu, Jiarui Xu, et al. Mmdetection: Open mmlab detection toolbox and benchmark. arXiv preprint arXiv:1906.07155, 2019.</p>
+<p>[11] Liang-Chieh Chen, Yukun Zhu, George Papandreou, Florian Schroff, and Hartwig Adam. Encoder-decoder with atrous separable convolution for semantic image segmentation. In Proceedings of the European conference on computer vision (ECCV), pages 801-818, 2018.</p>
+<p>[12] Yihong Chen, Zheng Zhang, Yue Cao, Liwei Wang, Stephen Lin, and Han Hu. Reppoints v2: Verification meets regression for object detection. In NeurIPS, 2020.</p>
+<p>[13] Cheng Chi, Fangyun Wei, and Han Hu. Relationnet++: Bridging visual representations for object detection via transformer decoder. In NeurIPS, 2020.</p>
+<p>[14] Krzysztof Marcin Choromanski, Valerii Likhosherstov, David Dohan, Xingyou Song, Andreea Gane, Tamas Sarlos, Peter Hawkins, Jared Quincy Davis, Afroz Mohiuddin, Lukasz Kaiser, David Benjamin Belanger, Lucy J Colwell, and Adrian Weller. Rethinking attention with performers. In International Conference on Learning Representations, 2021.</p>
+<p>[15] Xiangxiang Chu, Bo Zhang, Zhi Tian, Xiaolin Wei, and Huaxia Xia. Do we really need explicit position encodings for vision transformers? arXiv preprint arXiv:2102.10882, 2021.</p>
+<p>[16] MMSegmentation Contributors. MMSegmentation: Openmmlab semantic segmentation toolbox and benchmark. <a target="_blank" rel="noopener" href="https://github.com/open-mmlab/mmsegmentation" class="uri">https://github.com/open-mmlab/mmsegmentation</a>, 2020.</p>
+<p>[17] Ekin D Cubuk, Barret Zoph, Jonathon Shlens, and Quoc V Le. Randaugment: Practical automated data augmentation with a reduced search space. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition Workshops, pages 702-703, 2020.</p>
+<p>[18] Jifeng Dai, Haozhi Qi, Yuwen Xiong, Yi Li, Guodong Zhang, Han Hu, and Yichen Wei. Deformable convolutional networks. In Proceedings of the IEEE International Conference on Computer Vision, pages 764-773, 2017.</p>
+<p>[19] Jia Deng, Wei Dong, Richard Socher, Li-Jia Li, Kai Li, and Li Fei-Fei. Imagenet: A large-scale hierarchical image database. In 2009 IEEE conference on computer vision and pattern recognition, pages 248-255. Ieee, 2009.</p>
+<p>[20] Alexey Dosovitskiy, Lucas Beyer, Alexander Kolesnikov, Dirk Weissenborn, Xiaohua Zhai, Thomas Unterthiner, Mostafa Dehghani, Matthias Minderer, Georg Heigold, Sylvain Gelly, Jakob Uszkoreit, and Neil Houlsby. An image is worth 16x16 words: Transformers for image recognition at scale. In International Conference on Learning Representations, 2021.</p>
+<p>[21] Xianzhi Du, Tsung-Yi Lin, Pengchong Jin, Golnaz Ghiasi, Mingxing Tan, Yin Cui, Quoc V Le, and Xiaodan Song. Spinenet: Learning scale-permuted backbone for recognition and localization. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition, pages 11592-11601, 2020.</p>
+<p>[22] Hao-Shu Fang, Jianhua Sun, Runzhong Wang, Minghao Gou, Yong-Lu Li, and Cewu Lu. Instaboost: Boosting instance segmentation via probability map guided copy-pasting. In Proceedings of the IEEE/CVF International Conference on Computer Vision, pages 682-691, 2019.</p>
+<p>[23] Jun Fu, Jing Liu, Haijie Tian, Yong Li, Yongjun Bao, Zhiwei Fang, and Hanqing Lu. Dual attention network for scene segmentation. In Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition, pages 3146-3154, 2019.</p>
+<p>[24] Jun Fu, Jing Liu, Yuhang Wang, Yong Li, Yongjun Bao, Jinhui Tang, and Hanqing Lu. Adaptive context network for scene parsing. In Proceedings of the IEEE/CVF International Conference on Computer Vision, pages 6748-6757, 2019.</p>
+<p>[25] Kunihiko Fukushima. Cognitron: A self-organizing multilayered neural network. Biological cybernetics, 20(3):121-136, 1975.</p>
+<p>[26] Golnaz Ghiasi, Yin Cui, Aravind Srinivas, Rui Qian, Tsung-Yi Lin, Ekin D Cubuk, Quoc V Le, and Barret Zoph. Simple copy-paste is a strong data augmentation method for instance segmentation. arXiv preprint arXiv:2012.07177, 2020.</p>
+<p>[27] Jiayuan Gu, Han Hu, Liwei Wang, Yichen Wei, and Jifeng Dai. Learning region features for object detection. In Proceedings of the European Conference on Computer Vision (ECCV), 2018.</p>
+<p>[28] Kai Han, An Xiao, Enhua Wu, Jianyuan Guo, Chunjing Xu, and Yunhe Wang. Transformer in transformer. arXiv preprint arXiv:2103.00112, 2021.</p>
+<p>[29] Kaiming He, Georgia Gkioxari, Piotr Dollár, and Ross Girshick. Mask r-cnn. In Proceedings of the IEEE international conference on computer vision, pages 2961-2969, 2017.</p>
+<p>[30] Kaiming He, Xiangyu Zhang, Shaoqing Ren, and Jian Sun. Deep residual learning for image recognition. In Proceedings of the IEEE conference on computer vision and pattern recognition, pages 770-778, 2016.</p>
+<p>[31] Elad Hoffer, Tal Ben-Nun, Itay Hubara, Niv Giladi, Torsten Hoefler, and Daniel Soudry. Augment your batch: Improving generalization through instance repetition. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition, pages 8129-8138, 2020.</p>
+<p>[32] Han Hu, Jiayuan Gu, Zheng Zhang, Jifeng Dai, and Yichen Wei. Relation networks for object detection. In Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition, pages 3588-3597, 2018.</p>
+<p>[33] Han Hu, Zheng Zhang, Zhenda Xie, and Stephen Lin. Local relation networks for image recognition. In Proceedings of the IEEE/CVF International Conference on Computer Vision (ICCV), pages 3464-3473, October 2019.</p>
+<p>[34] Gao Huang, Zhuang Liu, Laurens Van Der Maaten, and Kilian Q Weinberger. Densely connected convolutional networks. In Proceedings of the IEEE conference on computer vision and pattern recognition, pages 4700-4708, 2017.</p>
+<p>[35] Gao Huang, Yu Sun, Zhuang Liu, Daniel Sedra, and Kilian Q Weinberger. Deep networks with stochastic depth. In European conference on computer vision, pages 646-661. Springer, 2016.</p>
+<p>[36] David H Hubel and Torsten N Wiesel. Receptive fields, binocular interaction and functional architecture in the cat’s visual cortex. The Journal of physiology, 160(1):106-154, 1962.</p>
+<p>[37] Diederik P Kingma and Jimmy Ba. Adam: A method for stochastic optimization. arXiv preprint arXiv:1412.6980, 2014.</p>
+<p>[38] Alexander Kolesnikov, Lucas Beyer, Xiaohua Zhai, Joan Puigcerver, Jessica Yung, Sylvain Gelly, and Neil Houlsby. Big transfer (bit): General visual representation learning. arXiv preprint arXiv:1912.11370, 6(2):8, 2019.</p>
+<p>[39] Alex Krizhevsky, Ilya Sutskever, and Geoffrey E Hinton. Imagenet classification with deep convolutional neural networks. In Advances in neural information processing systems, pages 1097-1105, 2012.</p>
+<p>[40] Yann LeCun, Léon Bottou, Yoshua Bengio, Patrick Haffner, et al. Gradient-based learning applied to document recognition. Proceedings of the IEEE, 86(11):2278-2324, 1998.</p>
+<p>[41] Yann LeCun, Patrick Haffner, Léon Bottou, and Yoshua Bengio. Object recognition with gradient-based learning. In Shape, contour and grouping in computer vision, pages 319-345. Springer, 1999.</p>
+<p>[42] Tsung-Yi Lin, Piotr Dollar, Ross Girshick, Kaiming He, Bharath Hariharan, and Serge Belongie. Feature pyramid networks for object detection. In The IEEE Conference on Computer Vision and Pattern Recognition (CVPR), July 2017.</p>
+<p>[43] Tsung-Yi Lin, Michael Maire, Serge Belongie, James Hays, Pietro Perona, Deva Ramanan, Piotr Dollár, and C Lawrence Zitnick. Microsoft coco: Common objects in context. In European conference on computer vision, pages 740-755. Springer, 2014.</p>
+<p>[44] Ilya Loshchilov and Frank Hutter. Decoupled weight decay regularization. In International Conference on Learning Representations, 2019.</p>
+<p>[45] Boris T Polyak and Anatoli B Juditsky. Acceleration of stochastic approximation by averaging. SIAM journal on control and optimization, 30(4):838-855, 1992.</p>
+<p>[46] Siyuan Qiao, Liang-Chieh Chen, and Alan Yuille. Detectors: Detecting objects with recursive feature pyramid and switchable atrous convolution. arXiv preprint arXiv:2006.02334, 2020.</p>
+<p>[47] Alec Radford, Jong Wook Kim, Chris Hallacy, Aditya Ramesh, Gabriel Goh, Sandhini Agarwal, Girish Sastry, Amanda Askell, Pamela Mishkin, Jack Clark, Gretchen Krueger, and Ilya Sutskever. Learning transferable visual models from natural language supervision, 2021.</p>
+<p>[48] Ilija Radosavovic, Raj Prateek Kosaraju, Ross Girshick, Kaiming He, and Piotr Dollár. Designing network design spaces. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition, pages 10428-10436, 2020.</p>
+<p>[49] Colin Raffel, Noam Shazeer, Adam Roberts, Katherine Lee, Sharan Narang, Michael Matena, Yanqi Zhou, Wei Li, and Peter J. Liu. Exploring the limits of transfer learning with a unified text-to-text transformer. Journal of Machine Learning Research, 21(140):1-67, 2020.</p>
+<p>[50] Prajit Ramachandran, Niki Parmar, Ashish Vaswani, Irwan Bello, Anselm Levskaya, and Jon Shlens. Stand-alone self-attention in vision models. In Advances in Neural Information Processing Systems, volume 32. Curran Associates, Inc., 2019.</p>
+<p>[51] Olaf Ronneberger, Philipp Fischer, and Thomas Brox. U-net: Convolutional networks for biomedical image segmentation. In International Conference on Medical image computing and computer-assisted intervention, pages 234-241. Springer, 2015.</p>
+<p>[52] K. Simonyan and A. Zisserman. Very deep convolutional networks for large-scale image recognition. In International Conference on Learning Representations, May 2015.</p>
+<p>[53] Bharat Singh and Larry S Davis. An analysis of scale invariance in object detection snip. In Proceedings of the IEEE conference on computer vision and pattern recognition, pages 3578-3587, 2018.</p>
+<p>[54] Bharat Singh, Mahyar Najibi, and Larry S Davis. Sniper: Efficient multi-scale training. In Advances in Neural Information Processing Systems, volume 31. Curran Associates, Inc., 2018.</p>
+<p>[55] Aravind Srinivas, Tsung-Yi Lin, Niki Parmar, Jonathon Shlens, Pieter Abbeel, and Ashish Vaswani. Bottleneck transformers for visual recognition. arXiv preprint arXiv:2101.11605, 2021.</p>
+<p>[56] Peize Sun, Rufeng Zhang, Yi Jiang, Tao Kong, Chenfeng Xu, Wei Zhan, Masayoshi Tomizuka, Lei Li, Zehuan Yuan, Changhu Wang, et al. Sparse r-cnn: End-to-end object detection with learnable proposals. arXiv preprint arXiv:2011.12450, 2020.</p>
+<p>[57] Christian Szegedy, Wei Liu, Yangqing Jia, Pierre Sermanet, Scott Reed, Dragomir Anguelov, Dumitru Erhan, Vincent Vanhoucke, and Andrew Rabinovich. Going deeper with convolutions. In Proceedings of the IEEE conference on computer vision and pattern recognition, pages 1-9, 2015.</p>
+<p>[58] Mingxing Tan and Quoc Le. Efficientnet: Rethinking model scaling for convolutional neural networks. In International Conference on Machine Learning, pages 6105-6114. PMLR, 2019.</p>
+<p>[59] Mingxing Tan, Ruoming Pang, and Quoc V Le. Efficientdet: Scalable and efficient object detection. In Proceedings of the IEEE/CVF conference on computer vision and pattern recognition, pages 10781-10790, 2020.</p>
+<p>[60] Yi Tay, Mostafa Dehghani, Samira Abnar, Yikang Shen, Dara Bahri, Philip Pham, Jinfeng Rao, Liu Yang, Sebastian Ruder, and Donald Metzler. Long range arena : A benchmark for efficient transformers. In International Conference on Learning Representations, 2021.</p>
+<p>[61] Ilya Tolstikhin, Neil Houlsby, Alexander Kolesnikov, Lucas Beyer, Xiaohua Zhai, Thomas Unterthiner, Jessica Yung, Andreas Steiner, Daniel Keysers, Jakob Uszkoreit, Mario Lucic, and Alexey Dosovitskiy. Mlp-mixer: An all-mlp architecture for vision, 2021.</p>
+<p>[62] Hugo Touvron, Piotr Bojanowski, Mathilde Caron, Matthieu Cord, Alaaeldin El-Nouby, Edouard Grave, Gautier Izacard, Armand Joulin, Gabriel Synnaeve, Jakob Verbeek, and Hervé Jégou. Resmlp: Feedforward networks for image classification with data-efficient training, 2021.</p>
+<p>[63] Hugo Touvron, Matthieu Cord, Matthijs Douze, Francisco Massa, Alexandre Sablayrolles, and Hervé Jégou. Training data-efficient image transformers &amp; distillation through attention. arXiv preprint arXiv:2012.12877, 2020.</p>
+<p>[64] Ashish Vaswani, Noam Shazeer, Niki Parmar, Jakob Uszkoreit, Llion Jones, Aidan N Gomez, Łukasz Kaiser, and Illia Polosukhin. Attention is all you need. In Advances in Neural Information Processing Systems, pages 5998-6008, 2017.</p>
+<p>[65] Jingdong Wang, Ke Sun, Tianheng Cheng, Borui Jiang, Chaorui Deng, Yang Zhao, Dong Liu, Yadong Mu, Mingkui Tan, Xinggang Wang, et al. Deep high-resolution representation learning for visual recognition. IEEE transactions on pattern analysis and machine intelligence, 2020.</p>
+<p>[66] Wenhai Wang, Enze Xie, Xiang Li, Deng-Ping Fan, Kaitao Song, Ding Liang, Tong Lu, Ping Luo, and Ling Shao. Pyramid vision transformer: A versatile backbone for dense prediction without convolutions. arXiv preprint arXiv:2102.12122, 2021.</p>
+<p>[67] Xiaolong Wang, Ross Girshick, Abhinav Gupta, and Kaiming He. Non-local neural networks. In IEEE Conference on Computer Vision and Pattern Recognition, CVPR 2018, 2018.</p>
+<p>[68] Ross Wightman. Pytorch image models. <a target="_blank" rel="noopener" href="https://github.com/rwightman/pytorch-image-models" class="uri">https://github.com/rwightman/pytorch-image-models</a>, 2019.</p>
+<p>[69] Tete Xiao, Yingcheng Liu, Bolei Zhou, Yuning Jiang, and Jian Sun. Unified perceptual parsing for scene understanding. In Proceedings of the European Conference on Computer Vision (ECCV), pages 418-434, 2018.</p>
+<p>[70] Saining Xie, Ross Girshick, Piotr Dollár, Zhuowen Tu, and Kaiming He. Aggregated residual transformations for deep neural networks. In Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition, pages 1492-1500, 2017.</p>
+<p>[71] Minghao Yin, Zhuliang Yao, Yue Cao, Xiu Li, Zheng Zhang, Stephen Lin, and Han Hu. Disentangled non-local neural networks. In Proceedings of the European conference on computer vision (ECCV), 2020.</p>
+<p>[72] Li Yuan, Yunpeng Chen, Tao Wang, Weihao Yu, Yujun Shi, Francis EH Tay, Jiashi Feng, and Shuicheng Yan. Tokens-to-token vit: Training vision transformers from scratch on imagenet. arXiv preprint arXiv:2101.11986, 2021.</p>
+<p>[73] Yuhui Yuan, Xilin Chen, and Jingdong Wang. Object-contextual representations for semantic segmentation. In 16th European Conference Computer Vision (ECCV 2020), August 2020.</p>
+<p>[74] Yuhui Yuan and Jingdong Wang. Ocnet: Object context network for scene parsing. arXiv preprint arXiv:1809.00916, 2018.</p>
+<p>[75] Sangdoo Yun, Dongyoon Han, Seong Joon Oh, Sanghyuk Chun, Junsuk Choe, and Youngjoon Yoo. Cutmix: Regularization strategy to train strong classifiers with localizable features. In Proceedings of the IEEE/CVF International Conference on Computer Vision, pages 6023-6032, 2019.</p>
+<p>[76] Sergey Zagoruyko and Nikos Komodakis. Wide residual networks. In BMVC, 2016.</p>
+<p>[77] Hongyi Zhang, Moustapha Cisse, Yann N Dauphin, and David Lopez-Paz. mixup: Beyond empirical risk minimization. arXiv preprint arXiv:1710.09412, 2017.</p>
+<p>[78] Hang Zhang, Chongruo Wu, Zhongyue Zhang, Yi Zhu, Zhi Zhang, Haibin Lin, Yue Sun, Tong He, Jonas Mueller, R Manmatha, et al. Resnest: Split-attention networks. arXiv preprint arXiv:2004.08955, 2020.</p>
+<p>[79] Shifeng Zhang, Cheng Chi, Yongqiang Yao, Zhen Lei, and Stan Z Li. Bridging the gap between anchor-based and anchor-free detection via adaptive training sample selection. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition, pages 9759-9768, 2020.</p>
+<p>[80] Hengshuang Zhao, Jiaya Jia, and Vladlen Koltun. Exploring self-attention for image recognition. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition, pages 10076-10085, 2020.</p>
+<p>[81] Sixiao Zheng, Jiachen Lu, Hengshuang Zhao, Xiatian Zhu, Zekun Luo, Yabiao Wang, Yanwei Fu, Jianfeng Feng, Tao Xiang, Philip HS Torr, et al. Rethinking semantic segmentation from a sequence-to-sequence perspective with transformers. arXiv preprint arXiv:2012.15840, 2020.</p>
+<p>[82] Zhun Zhong, Liang Zheng, Guoliang Kang, Shaozi Li, and Yi Yang. Random erasing data augmentation. In Proceedings of the AAAI Conference on Artificial Intelligence, volume 34, pages 13001-13008, 2020.</p>
+<p>[83] Bolei Zhou, Hang Zhao, Xavier Puig, Tete Xiao, Sanja Fidler, Adela Barriuso, and Antonio Torralba. Semantic understanding of scenes through the ade20k dataset. International Journal on Computer Vision, 2018.</p>
+<p>[84] Xizhou Zhu, Han Hu, Stephen Lin, and Jifeng Dai. Deformable convnets v2: More deformable, better results. In Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition, pages 9308-9316, 2019.</p>
+<p>[85] Xizhou Zhu, Weijie Su, Lewei Lu, Bin Li, Xiaogang Wang, and Jifeng Dai. Deformable detr: Deformable transformers for end-to-end object detection. In International Conference on Learning Representations, 2021.</p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>Swin Transformer阅读笔记</div>
+      <div>http://example.com/2026/08/28/Swin Transformer阅读笔记/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Qingxing Liao</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2026年8月28日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2026/08/28/hello-world/" title="Hello World">
+                        <span class="hidden-mobile">Hello World</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+  
+  
+
+
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    function isExpandAllEnabled() {
+      return CONFIG.toc && CONFIG.toc.expand_all === true;
+    }
+    function expandAllToc() {
+      if (!isExpandAllEnabled()) { return; }
+      jQuery('#toc-body .tocbot-is-collapsed').removeClass('tocbot-is-collapsed');
+    }
+    function updateTocToggle($li, $childList) {
+      var $toggle = $li.children('.toc-toggle');
+      if ($toggle.length === 0) { return; }
+      var collapsed = $childList.hasClass('tocbot-is-collapsed');
+      $toggle
+        .toggleClass('toc-toggle-collapsed', collapsed)
+        .toggleClass('toc-toggle-expanded', !collapsed);
+    }
+    function bindTocToggle() {
+      if (!isExpandAllEnabled()) { return; }
+      jQuery('#toc-body .toc-list-item').each(function() {
+        var $li = jQuery(this);
+        var $childList = $li.children('ol');
+        if ($childList.length === 0) {
+          if ($li.children('.toc-toggle').length === 0) {
+            $li.prepend('<span class="toc-toggle toc-toggle-placeholder" aria-hidden="true">›</span>');
+          }
+          return;
+        }
+
+        if ($li.children('.toc-toggle').length === 0) {
+          $li.prepend('<span class="toc-toggle toc-toggle-expanded" aria-hidden="true">›</span>');
+        }
+        updateTocToggle($li, $childList);
+      });
+      jQuery('#toc-body').off('click.tocToggle').on('click.tocToggle', '.toc-toggle', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        var $li = jQuery(this).parent('.toc-list-item');
+        var $childList = $li.children('ol');
+        if ($childList.length === 0) { return; }
+        $childList.toggleClass('tocbot-is-collapsed');
+        updateTocToggle($li, $childList);
+      });
+      if (!window.__tocToggleObserver) {
+        window.__tocToggleObserver = new MutationObserver(function(mutations) {
+          mutations.forEach(function(mutation) {
+            if (mutation.type !== 'attributes' || mutation.attributeName !== 'class') { return; }
+            var $list = jQuery(mutation.target);
+            var $li = $list.parent('.toc-list-item');
+            if ($li.length === 0) { return; }
+            updateTocToggle($li, $list);
+          });
+        });
+        jQuery('#toc-body ol').each(function() {
+          window.__tocToggleObserver.observe(this, { attributes: true });
+        });
+      }
+    }
+    var tocConfig = Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc);
+    if (isExpandAllEnabled()) {
+      tocConfig.collapseDepth = 6;
+    }
+    window.tocbot.init(tocConfig);
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+    expandAllToc();
+    bindTocToggle();
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+        expandAllToc();
+        bindTocToggle();
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/5.0.0/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  
+      <script>
+        if (!window.MathJax) {
+          window.MathJax = {
+            tex    : {
+              inlineMath: { '[+]': [['$', '$']] }
+            },
+            loader : {
+              load: ['ui/lazy']
+            },
+            options: {
+              renderActions: {
+                insertedScript: [200, () => {
+                  document.querySelectorAll('mjx-container').forEach(node => {
+                    let target = node.parentNode;
+                    if (target.nodeName.toLowerCase() === 'li') {
+                      target.parentNode.classList.add('has-jax');
+                    }
+                  });
+                }, '', false]
+              }
+            }
+          };
+        } else {
+          MathJax.startup.document.state(0);
+          MathJax.texReset();
+          MathJax.typeset();
+          MathJax.typesetPromise();
+        }
+
+        Fluid.events.registerRefreshCallback(function() {
+          if ('MathJax' in window && MathJax.startup.document && typeof MathJax.startup.document.state === 'function') {
+            MathJax.startup.document.state(0);
+            MathJax.texReset();
+            MathJax.typeset();
+            MathJax.typesetPromise();
+          }
+        });
+      </script>
+    
+
+  <script  src="https://lib.baomitu.com/mathjax/3.2.2/es5/tex-mml-chtml.js" ></script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>
