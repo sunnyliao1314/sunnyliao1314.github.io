@@ -33,7 +33,7 @@
 <meta property="og:image" content="http://example.com/2026/08/28/Swin%20Transformer%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/figure-3.png">
 <meta property="og:image" content="http://example.com/2026/08/28/Swin%20Transformer%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/figure-4.png">
 <meta property="article:published_time" content="2026-08-28T13:24:53.000Z">
-<meta property="article:modified_time" content="2026-08-28T14:44:42.286Z">
+<meta property="article:modified_time" content="2026-08-29T09:32:42.088Z">
 <meta property="article:author" content="Qingxing Liao">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="http://example.com/2026/08/28/Swin%20Transformer%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/Pasted%20image%2020260825125957.png">
@@ -473,7 +473,8 @@
 <h4 id="相对位置偏置">相对位置偏置</h4>
 <p>参照文献 [49, 1, 32, 33]，本文在每个注意力头的相似度计算中加入相对位置偏置 <span class="math inline">\(B \in ℝ^{M^2 \times M^2}\)</span>： <span class="math display">\[ Attention(Q,K,V) =\text{SoftMax}(\dfrac{Q K^T}{\sqrt{d}}+B)\cdot V \quad (4)\]</span> 其中，<span class="math inline">\(Q, K, V \in ℝ^{M^2 \times d}\)</span> 分别是查询、键和值矩阵；<span class="math inline">\(d\)</span> 为查询/键的维度；<span class="math inline">\(M^2\)</span> 是窗口中的图像块数量。沿每个空间轴的相对位置取值范围为 <span class="math inline">\([−M+1, M−1]\)</span>，因此只需参数化一个较小的偏置矩阵 <span class="math inline">\(\hat{B} \in ℝ^{(2M−1)\times (2M−1)}\)</span>，再从 <span class="math inline">\(\hat{B}\)</span> 中索引得到 <span class="math inline">\(B\)</span>。</p>
 <p>表 4 显示，相比不使用该偏置或采用绝对位置嵌入的模型，相对位置偏置带来显著提升。若像 ViT [20] 那样在输入中进一步加入绝对位置嵌入，性能反而略有下降，因此本文不采用这种做法。预训练得到的相对位置偏置还可通过双三次插值 [20, 63]，用于初始化不同窗口尺寸的微调模型。</p>
-<p>关于这里采用的<mark>相对位置编码</mark>结合源代码的详细讲解，请见“4. DeepWiki Q&amp;A with Code Context for Repository Swin-Transformer”。 ### 3.3 架构变体</p>
+<p>关于这里采用的<mark>相对位置编码</mark>结合源代码的详细讲解，请见“4. DeepWiki Q&amp;A with Code Context for Repository Swin-Transformer”。</p>
+<h3 id="架构变体">3.3 架构变体</h3>
 <p>基础模型 Swin-B 的规模与计算复杂度与 ViT-B/DeiT-B 相近。本文还构建了 Swin-T、Swin-S 和 Swin-L，其模型规模与计算复杂度分别约为基础模型的 0.25、0.5 和 2 倍。Swin-T 与 Swin-S 的复杂度分别与 ResNet-50（DeiT-S）和 ResNet-101 接近。所有实验默认窗口尺寸 <span class="math inline">\(M = 7\)</span>，每个注意力头的查询维度 <span class="math inline">\(d = 32\)</span>，MLP 扩展率 <span class="math inline">\(\alpha = 4\)</span>。各变体的超参数如下：</p>
 <ul>
 <li><strong>Swin-T：</strong> <span class="math inline">\(C = 96\)</span>，各阶段层数为 <span class="math inline">\(\{2, 2, 6, 2\}\)</span>；</li>
