@@ -1,0 +1,1958 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Qingxing Liao">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="一张图像值 16×16 个词：Transformer 可用于大规模图像识别  Alexey Dosovitskiy、Lucas Beyer、Alexander Kolesnikov、Dirk Weissenborn、Xiaohua Zhai、Thomas Unterthiner、Mostafa Dehghani、Matthias Minderer、Georg Heigold、Sylvain G">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Vision Transformer阅读笔记">
+<meta property="og:url" content="http://example.com/2026/08/28/Vision%20Transformer%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/index.html">
+<meta property="og:site_name" content="Qingxingliao Blog">
+<meta property="og:description" content="一张图像值 16×16 个词：Transformer 可用于大规模图像识别  Alexey Dosovitskiy、Lucas Beyer、Alexander Kolesnikov、Dirk Weissenborn、Xiaohua Zhai、Thomas Unterthiner、Mostafa Dehghani、Matthias Minderer、Georg Heigold、Sylvain G">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/2026/08/28/Vision%20Transformer%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/%E4%B8%80%E5%9B%BE%E6%B5%81Vision-Transformer%E6%9E%B6%E6%9E%84_01.png">
+<meta property="og:image" content="http://example.com/2026/08/28/Vision%20Transformer%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/paste-12.png">
+<meta property="og:image" content="http://example.com/2026/08/28/Vision%20Transformer%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/paste-13.png">
+<meta property="og:image" content="http://example.com/2026/08/28/Vision%20Transformer%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/paste-14.png">
+<meta property="og:image" content="http://example.com/2026/08/28/Vision%20Transformer%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/paste-15.png">
+<meta property="og:image" content="http://example.com/2026/08/28/Vision%20Transformer%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/paste-16.png">
+<meta property="og:image" content="http://example.com/2026/08/28/Vision%20Transformer%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/paste-17.png">
+<meta property="og:image" content="http://example.com/2026/08/28/Vision%20Transformer%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/paste-24.png">
+<meta property="og:image" content="http://example.com/2026/08/28/Vision%20Transformer%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/paste-23.png">
+<meta property="og:image" content="http://example.com/2026/08/28/Vision%20Transformer%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/paste-22.png">
+<meta property="og:image" content="http://example.com/2026/08/28/Vision%20Transformer%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/paste-21.png">
+<meta property="og:image" content="http://example.com/2026/08/28/Vision%20Transformer%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/paste-20.png">
+<meta property="og:image" content="http://example.com/2026/08/28/Vision%20Transformer%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/paste-19.png">
+<meta property="article:published_time" content="2026-08-28T13:24:53.000Z">
+<meta property="article:modified_time" content="2026-09-05T15:55:40.574Z">
+<meta property="article:author" content="Qingxing Liao">
+<meta property="article:tag" content="AI">
+<meta property="article:tag" content="CV">
+<meta property="article:tag" content="Vision Transformer">
+<meta property="article:tag" content="Vit">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://example.com/2026/08/28/Vision%20Transformer%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/%E4%B8%80%E5%9B%BE%E6%B5%81Vision-Transformer%E6%9E%B6%E6%9E%84_01.png">
+  
+  
+  
+  <title>Vision Transformer阅读笔记 - Qingxingliao Blog</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1736178_k526ubmyhba.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.9.9","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"expand_all":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"openkounter":{"server_url":"https://open-kounter.mintimate.cn","path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 8.1.2"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Qingxingliao Blog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content (desktop) -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- Mobile grid menu overlay -->
+<div id="mobile-grid-menu" class="d-lg-none">
+  <div class="mobile-grid-menu-inner">
+    <div class="container">
+      <div class="row">
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-home-fill"></i>
+                  <span>首页</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/archives/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-archive-fill"></i>
+                  <span>归档</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/categories/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-category-fill"></i>
+                  <span>分类</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/tags/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-tags-fill"></i>
+                  <span>标签</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/about/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-user-fill"></i>
+                  <span>关于</span>
+                </div>
+              </a>
+            </div>
+          
+        
+        
+          <div class="col-4 mobile-grid-cell" id="mobile-search-btn">
+            <a href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <div class="mobile-grid-item">
+                <i class="iconfont icon-search"></i>
+                <span>搜索</span>
+              </div>
+            </a>
+          </div>
+        
+        
+          <div class="col-4 mobile-grid-cell" id="mobile-color-toggle-btn"
+               data-label-light="开灯"
+               data-label-dark="关灯">
+            <a href="javascript:;" aria-label="Color Toggle">
+              <div class="mobile-grid-item">
+                <i class="iconfont icon-dark" id="mobile-color-toggle-icon"></i>
+                <span id="mobile-color-toggle-label">关灯</span>
+              </div>
+            </a>
+          </div>
+        
+      </div>
+    </div>
+  </div>
+</div>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/%5B%E8%94%9A%E8%97%8D%E6%AA%94%E6%A1%88%5D%20%E3%80%90%E8%94%9A%E8%97%8D%E6%AA%94%E6%A1%88%E3%80%91%E9%A6%96%E6%94%AFPV%E6%90%B6%E5%85%88%E6%9B%9D%E5%85%89%20(Y0Dm7AF36-k)1256.jpg') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="Vision Transformer阅读笔记"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2026-08-28 21:24" pubdate>
+          2026年8月28日 晚上
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          27k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          227 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">Vision Transformer阅读笔记</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h2 id="一张图像值-1616-个词transformer-可用于大规模图像识别">一张图像值 16×16 个词：Transformer 可用于大规模图像识别</h2>
+<blockquote>
+<p><strong>Alexey Dosovitskiy、Lucas Beyer、Alexander Kolesnikov、Dirk Weissenborn、Xiaohua Zhai、Thomas Unterthiner、Mostafa Dehghani、Matthias Minderer、Georg Heigold、Sylvain Gelly、Jakob Uszkoreit、Neil Houlsby</strong> Google Research, Brain Team ICLR 2021 会议论文 中文译文；模型名、数据集名、数学符号与参考文献保留原文形式。*</p>
+</blockquote>
+<h2 id="摘要">摘要</h2>
+<p>Transformer 架构已成为自然语言处理任务事实上的标准，但在计算机视觉领域的应用仍然有限。现有视觉方法通常将注意力与卷积网络配合使用，或者只用注意力替换卷积网络的某些部件，整体结构仍然保持不变。本文表明，这种对 CNN 的依赖并非必要：把纯 Transformer 直接应用于图像块序列，便能在图像分类任务上取得出色表现。我们先使用大量数据预训练，再将模型迁移到多个中小规模图像识别基准（ImageNet、CIFAR-100、VTAB 等）。实验结果显示，视觉 Transformer（Vision Transformer, ViT）的表现优于或媲美当时最先进的卷积网络，而预训练所需的计算资源显著更少。 <img src="/2026/08/28/Vision%20Transformer%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/%E4%B8%80%E5%9B%BE%E6%B5%81Vision-Transformer%E6%9E%B6%E6%9E%84_01.png" srcset="/img/loading.gif" lazyload class="" title="图1：一图流Vision-Transformer架构"></p>
+<h2 id="引言">1　引言</h2>
+<p>以自注意力为核心的架构，尤其是 Transformer（Vaswani et al., 2017），已经成为自然语言处理（NLP）的首选模型。当前主流做法是先在大型文本语料库上预训练，再针对较小的特定任务数据集进行微调（Devlin et al., 2019）。Transformer 具有良好的计算效率和扩展性，使得训练超过 1000 亿参数的空前大型模型成为可能（Brown et al., 2020; Lepikhin et al., 2020）。随着模型与数据集继续增长，性能尚未出现饱和迹象。</p>
+<p>然而，计算机视觉仍由卷积架构主导（LeCun et al., 1989; Krizhevsky et al., 2012; He et al., 2016）。受 NLP 领域成功的启发，一些研究尝试把类 CNN 架构与自注意力结合（Wang et al., 2018; Carion et al., 2020），还有一些方法完全用自注意力取代卷积（Ramachandran et al., 2019; Wang et al., 2020a）。后一类模型在理论上效率很高，但它们使用特殊注意力模式，至今未能在现代硬件加速器上高效扩展。因此，在大规模图像识别中，类 ResNet 的经典架构仍然代表着最先进水平（Mahajan et al., 2018; Xie et al., 2020; Kolesnikov et al., 2020）。</p>
+<p>受 Transformer 在 NLP 中良好扩展能力的启发，我们尝试以尽可能少的修改，把标准 Transformer 直接用于图像。具体而言，我们将图像分成若干图像块（patch），对每个图像块做线性嵌入，再把得到的序列输入 Transformer。在这里，图像块的地位与 NLP 中的词元（token，即词）相同。模型通过监督学习完成图像分类训练。</p>
+<p>若只在 ImageNet 这类中等规模数据集上训练，又不采用强正则化，这些模型的准确率会比规模相近的 ResNet 低几个百分点。这一结果看似令人气馁，却不难解释：Transformer 缺少 CNN 内在的某些归纳偏置，例如平移等变性和局部性。当训练数据不足时，它们的泛化能力也较差。</p>
+<p>一旦把训练规模扩大到 1400 万至 3 亿张图像，情况就完全不同。我们发现，大规模训练可以弥补归纳偏置的不足。只要预训练规模足够大，再将模型迁移到数据较少的任务，ViT 就能取得非常出色的结果。当我们在公开的 ImageNet-21k 或内部 JFT-300M 数据集上预训练时，ViT 在多项图像识别基准上达到或超过了最先进水平。最佳模型在 ImageNet、ImageNet-ReaL、CIFAR-100 和包含 19 项任务的 VTAB 套件上，准确率分别达到 88.55%、90.72%、94.55% 和 77.63%。</p>
+<blockquote>
+<p>微调代码和预训练模型见：<a target="_blank" rel="noopener" href="https://github.com/google-research/vision_transformer" class="uri">https://github.com/google-research/vision_transformer</a></p>
+</blockquote>
+<h2 id="相关工作">2　相关工作</h2>
+<p>Vaswani 等人（2017）最初为机器翻译提出 Transformer，此后它在许多 NLP 任务中取得了最先进成绩。大型 Transformer 模型通常先在大规模语料库上预训练，再针对目标任务微调。BERT（Devlin et al., 2019）采用去噪自监督任务，GPT 系列则把语言建模作为预训练任务（Radford et al., 2018; 2019; Brown et al., 2020）。</p>
+<p>若直接对图像使用自注意力，每个像素都要与其他所有像素互相关注，计算代价随像素数量呈平方增长，无法扩展到实际输入尺寸。为将 Transformer 用于图像处理，过去的研究尝试了多种近似方案。Parmar 等人（2018）没有进行全局注意，而是对每个查询像素只在局部邻域内计算自注意力。这种局部多头点积自注意力块可以完全取代卷积（Hu et al., 2019; Ramachandran et al., 2019; Zhao et al., 2020）。Sparse Transformer（Child et al., 2019）则用可扩展的近似方法实现全局自注意力。其他扩展方式还包括在不同尺寸的块内计算注意力（Weissenborn et al., 2019），甚至只沿单个轴向计算（Ho et al., 2019; Wang et al., 2020a）。这些专门设计的注意力架构在计算机视觉任务上显示出潜力，但要在硬件加速器上高效实现，往往需要复杂的工程优化。</p>
+<p>与本文最接近的是 Cordonnier 等人（2020）的模型。该方法从输入图像中提取 2×2 的图像块，再在其上应用完整自注意力。它与 ViT 非常相似，但我们进一步证明：借助大规模预训练，标准 Transformer 可以达到甚至超越最先进 CNN 的水平。此外，Cordonnier 等人使用的 2×2 像素块过小，模型只适用于低分辨率图像；我们的方法也能处理中等分辨率图像。</p>
+<p>将卷积神经网络（CNN）与各种自注意力结合的方法也广受关注。例如，可以在图像分类中用自注意力增强特征图（Bello et al., 2019），也可以继续用自注意力处理 CNN 输出，并将其用于目标检测（Hu et al., 2018; Carion et al., 2020）、视频处理（Wang et al., 2018; Sun et al., 2019）、图像分类（Wu et al., 2020）、无监督目标发现（Locatello et al., 2020）以及文本—视觉统一任务（Chen et al., 2020c; Lu et al., 2019; Li et al., 2019）。</p>
+<p>近期的另一个相关模型是 image GPT（iGPT；Chen et al., 2020a）。它先降低图像分辨率和色彩空间，再直接将 Transformer 用于图像像素。该模型以生成模型方式进行无监督训练，学得的表征随后可以微调，或用线性探测器评估分类性能，在 ImageNet 上的最高准确率为 72%。</p>
+<p>本文还加入了越来越多探索超 ImageNet 规模图像识别的研究行列。加入更多数据源，可以在标准基准上取得最先进结果（Mahajan et al., 2018; Touvron et al., 2019; Xie et al., 2020）。Sun 等人（2017）研究了 CNN 性能如何随数据集规模增长；Kolesnikov 等人（2020）和 Djolonga 等人（2020）则实证考察了从 ImageNet-21k、JFT-300M 等大规模数据集进行 CNN 迁移学习的效果。我们也重点使用这两个数据集，但训练的是 Transformer，而不是过去工作所用的 ResNet 系模型。</p>
+<h2 id="方法">3　方法</h2>
+<p>在模型设计上，我们尽可能遵循原始 Transformer（Vaswani et al., 2017）。这种有意保持简洁的设计有一个明显优势：成熟、可扩展的 NLP Transformer 架构及其高效实现几乎可以直接复用。</p>
+<h3 id="视觉-transformervit">3.1　视觉 Transformer（ViT）</h3>
+
+<p><strong>图 1</strong>：模型概览。我们把图像分成大小固定的图像块，对每个图像块进行线性嵌入，加上位置嵌入，然后将所得向量序列输入标准 Transformer 编码器。为完成分类，我们采用标准做法：在序列中额外加入一个可学习的“分类词元”。Transformer 编码器的示意图受 Vaswani 等人（2017）启发。</p>
+<p>标准 Transformer 接收一维词元嵌入序列作为输入。为了处理二维图像，我们将图像 <span class="math inline">\(x \in R^{H\times W\times C}\)</span> 重塑为展平的二维图像块序列 <span class="math inline">\(x_p \in R^{N\times(P^2 \cdot C)}\)</span>。其中， <span class="math inline">\((H,W)\)</span> 是原图分辨率， <span class="math inline">\(C\)</span> 是通道数，<span class="math inline">\((P, P)\)</span> 是每个图像块的分辨率，<span class="math inline">\(N = HW/P^2\)</span> 是图像块数，也是 Transformer 的<mark>有效输入序列长度</mark>（对应 NLP 的上下文长度）。Transformer 各层一直使用维度固定的潜在向量 <span class="math inline">\(D\)</span>，因此我们将图像块<mark>展平</mark>，并用可训练的<mark>线性投影</mark>把它们映射到 <span class="math inline">\(D\)</span> 维（式 1）。我们将该投影的输出称为<mark>图像块嵌入（patch embedding）</mark>。</p>
+<p>与 BERT 的 <code>[class]</code> 词元类似，我们在图像块嵌入序列前加入一个可学习嵌入（<span class="math inline">\(\mathbf{z}_0^0 = x_{class}\)</span>），并把它在 Transformer 编码器输出端的状态 <span class="math inline">\(\mathbf{z}_L^0\)</span> 作为图像表征 <span class="math inline">\(\mathbf{y}\)</span>（式 4）。预训练和微调时，<span class="math inline">\(\mathbf{z}_0^1\)</span> 后都接一个分类头。预训练阶段的分类头是含一个隐藏层的多层感知机（MLP）；微调阶段则改用单个线性层。</p>
+<p>为保留位置信息，我们在图像块嵌入上加入<mark>位置嵌入</mark>。我们使用标准的可学习一维位置嵌入，因为实验中并未发现更先进、能感知二维结构的位置嵌入带来明显改进（附录 D.4）。最终的嵌入向量序列被送入编码器。</p>
+<p><mark>Transformer 编码器</mark>（Vaswani et al., 2017）由多头自注意力（multiheaded self-attention, MSA；见附录 A）层与 MLP 块交替构成（式 2、3）。每个块之前使用层归一化（LayerNorm, LN），每个块之后使用残差连接（Wang et al., 2019; Baevski &amp; Auli, 2019）。MLP 含两层，采用 GELU 非线性激活。 <span class="math display">\[ \mathbf{z}_0 = [x_{class}; x^1_p \mathbf{E}; x^2_p \mathbf{E}; \cdots; x^n_p \mathbf{E}] + \mathbf{E}_{pos}, \mathbf{E} \in \mathbf{R}^{(P^2 \cdot C)\times D}, \quad E_{pos} \in R^{(N+1)\times D} 　(1)\]</span> <span class="math display">\[ \mathbf{z}&#39;_ℓ = MSA(LN(z_{ℓ-1})) + z_{ℓ-1}, \quad ℓ = 1…L 　(2)\]</span> <span class="math display">\[ \mathbf{z}_ℓ = MLP(LN(z&#39;_ℓ)) + z&#39;_ℓ, \quad ℓ = 1…L 　(3)\]</span> <span class="math display">\[ \mathbf{y} = LN(\mathbf{z}_L^0) 　(4)\]</span> <strong>归纳偏置。</strong> 与 CNN 相比，ViT 中针对图像的归纳偏置要少得多。CNN 在整个模型的每一层中都内置了局部性、二维邻域结构和平移等变性。ViT 只有 MLP 层具备局部性和平移等变性，自注意力层则是全局的。模型对二维邻域结构的使用很少：开始时用于切分图像块，微调时用于调整不同分辨率图像的位置嵌入（如下文所述）。除此之外，初始化时的位置嵌入并不包含图像块二维位置的信息，块与块之间的所有空间关系都必须从头学习。</p>
+<p><strong>混合架构。</strong> 除了原始图像块，也可以用 CNN（LeCun et al., 1989）的特征图构造输入序列。在这种混合模型中，式 1 中的图像块嵌入投影 <span class="math inline">\(\mathbf{E}\)</span> 作用于从 CNN 特征图提取的图像块。一个特例是使用空间尺寸为 1×1 的块，即直接展平特征图的空间维度，再投影到 Transformer 维度。分类输入嵌入和位置嵌入的加入方式与上文相同。</p>
+<h3 id="微调与更高分辨率">3.2　微调与更高分辨率</h3>
+<p>通常，我们先在大型数据集上预训练 ViT，再在较小的下游任务上<mark>微调</mark>。为此，我们移除预训练预测头，接上一个零初始化的 <span class="math inline">\(D×K\)</span> 前馈层，其中 <span class="math inline">\(K\)</span> 是下游任务的类别数。使用比预训练<mark>更高的分辨率</mark>进行微调往往有利（Touvron et al., 2019; Kolesnikov et al., 2020）。输入高分辨率图像时，我们保持图像块尺寸不变，因而有效序列会变长。ViT 可以处理任意序列长度（上限由内存决定），但预训练得到的位置嵌入此时可能已失去意义。我们因此根据图像块在原图中的位置，对<mark>预训练位置嵌入</mark>做<mark>二维插值</mark>。请注意，在 ViT 中手工注入图像二维结构归纳偏置的地方，只有这种分辨率调整和图像块提取两处。</p>
+<h2 id="实验">4　实验</h2>
+<p>我们评估 ResNet、视觉 Transformer（ViT）与混合模型的表征学习能力。为理解各模型对数据的需求，我们在规模不同的数据集上预训练，再用众多基准任务评估。若把预训练计算成本纳入考量，ViT 表现很有竞争力：它用更低的预训练成本，在大多数识别基准上达到了最先进水平。最后，我们还做了一项小规模自监督实验，结果表明自监督 ViT 具有很大潜力。</p>
+<h3 id="实验设置">4.1　实验设置</h3>
+<p><strong>数据集。</strong> 为研究模型的扩展性，我们使用了三个预训练数据集：含 1000 类、130 万张图像的 ILSVRC-2012 ImageNet（下文简称 ImageNet）；它的超集 ImageNet-21k，含 2.1 万类、1400 万张图像（Deng et al., 2009）；以及含 1.8 万类、3.03 亿张高分辨率图像的 JFT（Sun et al., 2017）。按照 Kolesnikov 等人（2020）的做法，我们对预训练数据集与下游任务测试集进行去重。随后，将模型迁移到多个基准任务：使用原始验证标签和清理后 ReaL 标签（Beyer et al., 2020）的 ImageNet、CIFAR-10/100（Krizhevsky, 2009）、Oxford-IIIT Pets（Parkhi et al., 2012）和 Oxford Flowers-102（Nilsback &amp; Zisserman, 2008）。这些数据集的预处理遵循 Kolesnikov 等人（2020）。</p>
+<p>我们还在含 19 项分类任务的 VTAB 套件（Zhai et al., 2019b）上评估。VTAB 用每项任务 1000 个训练样本，测试模型在低数据条件下向多样任务迁移的能力。任务分为三组：自然类（Natural），包括 Pets、CIFAR 等常规图像；专业类（Specialized），包括医学和卫星图像；结构类（Structured），包括定位等需要几何理解的任务。</p>
+<p><strong>模型变体。</strong> ViT 的配置以 BERT（Devlin et al., 2019）使用的配置为基础，见表 1。Base 和 Large 直接沿用 BERT 的设计，另加一个更大的 Huge 变体。下文用简写同时表示模型规模和输入块尺寸；例如，ViT-L/16 表示 Large 变体，输入图像块为 16×16。Transformer 的序列长度与图像块尺寸的平方成反比，因此块越小，模型计算代价越高。</p>
+<table>
+<thead>
+<tr class="header">
+<th style="text-align: center;">模型</th>
+<th style="text-align: center;">层数</th>
+<th style="text-align: center;">隐藏维度 D</th>
+<th style="text-align: center;">MLP 尺寸</th>
+<th style="text-align: center;">头数</th>
+<th style="text-align: center;">参数量</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;">ViT-Base</td>
+<td style="text-align: center;">12</td>
+<td style="text-align: center;">768</td>
+<td style="text-align: center;">3072</td>
+<td style="text-align: center;">12</td>
+<td style="text-align: center;">8600 万</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">ViT-Large</td>
+<td style="text-align: center;">24</td>
+<td style="text-align: center;">1024</td>
+<td style="text-align: center;">4096</td>
+<td style="text-align: center;">16</td>
+<td style="text-align: center;">3.07 亿</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">ViT-Huge</td>
+<td style="text-align: center;">32</td>
+<td style="text-align: center;">1280</td>
+<td style="text-align: center;">5120</td>
+<td style="text-align: center;">16</td>
+<td style="text-align: center;">6.32 亿</td>
+</tr>
+</tbody>
+</table>
+<p><strong>表 1：</strong> 视觉 Transformer 各模型变体的详细配置。</p>
+<p>基线 CNN 采用 ResNet（He et al., 2016），但把批归一化（Batch Normalization；Ioffe &amp; Szegedy, 2015）替换为组归一化（Group Normalization；Wu &amp; He, 2018），并使用标准化卷积（Qiao et al., 2019）。这些修改能改善迁移性能（Kolesnikov et al., 2020），我们将修改后的模型称为“ResNet (BiT)”。混合模型以一个“像素”为块尺寸，将中间特征图输入 ViT。为比较不同序列长度，我们或取常规 ResNet50 第四阶段的输出，或删除第四阶段，把同样数量的层放到第三阶段（保持总层数不变），再取扩展后第三阶段的输出。后者得到的序列长度是前者的 4 倍，ViT 的计算也更昂贵。</p>
+<p><strong>训练与微调。</strong> 所有模型（包括 ResNet）均使用 Adam（Kingma &amp; Ba, 2015）训练，参数为 <span class="math inline">\(β₁ = 0.9\)</span>、<span class="math inline">\(β₂ = 0.999\)</span>，批大小为 4096，并使用 0.1 的较大权重衰减。我们发现，这一设置对所有模型的迁移都有帮助（附录 D.1 表明，与常规经验不同，在我们的设置中 Adam 对 ResNet 略优于 SGD）。学习率先线性预热，再线性衰减，详见附录 B.1。所有模型微调时使用带动量的 SGD，批大小为 512，见附录 B.1.1。表 2 的 ImageNet 结果使用更高分辨率微调：ViT-L/16 为 512，ViT-H/14 为 518；同时还采用了因子为 0.9999 的 Polyak–Juditsky 平均（Polyak &amp; Juditsky, 1992; Ramachandran et al., 2019; Wang et al., 2020b）。</p>
+<p><strong>评估指标。</strong> 下游数据集的结果用少样本准确率或微调准确率表示。微调准确率衡量模型在相应数据集上微调后的性能。少样本准确率则通过求解带正则项的最小二乘回归获得：它将一部分训练图像的冻结表征映射到 <span class="math inline">\(\{−1, 1\}^K\)</span> 目标向量。该问题可以用闭式解精确求得。我们主要关注微调性能，但在微调成本过高时，也会使用线性少样本准确率进行快速在线评估。</p>
+<h3 id="与最先进方法比较">4.2　与最先进方法比较</h3>
+<p>我们首先将最大的两个模型 ViT-H/14 和 ViT-L/16 与文献中的最先进 CNN 比较。第一个对比对象是 Big Transfer（BiT；Kolesnikov et al., 2020），它使用大型 ResNet 进行监督迁移学习。第二个是 Noisy Student（Xie et al., 2020），该方法用半监督学习在 ImageNet 和去除标签的 JFT-300M 上训练大型 EfficientNet。当时，Noisy Student 在 ImageNet 上保持最佳结果，BiT-L 则在本文报告的其他数据集上最优。所有模型均在 TPUv3 硬件上训练。我们用 TPUv3 核天数表示预训练开销，即 TPUv3 核数（每个芯片含 2 个核）与训练天数的乘积。</p>
+<table style="width:100%;">
+
+<thead>
+<tr class="header">
+<th style="text-align: center;">数据集</th>
+<th style="text-align: center;">ViT-H/14 (JFT)</th>
+<th style="text-align: center;">ViT-L/16 (JFT)</th>
+<th style="text-align: center;">ViT-L/16 (I21k)</th>
+<th style="text-align: center;">BiT-L (R152x4)</th>
+<th style="text-align: center;">Noisy Student</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;">ImageNet</td>
+<td style="text-align: center;">88.55 ± 0.04</td>
+<td style="text-align: center;">87.76 ± 0.03</td>
+<td style="text-align: center;">85.30 ± 0.02</td>
+<td style="text-align: center;">87.54 ± 0.02</td>
+<td style="text-align: center;">88.4/88.5*</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">ImageNet ReaL</td>
+<td style="text-align: center;">90.72 ± 0.05</td>
+<td style="text-align: center;">90.54 ± 0.03</td>
+<td style="text-align: center;">88.62 ± 0.05</td>
+<td style="text-align: center;">90.54</td>
+<td style="text-align: center;">90.55</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">CIFAR-10</td>
+<td style="text-align: center;">99.50 ± 0.06</td>
+<td style="text-align: center;">99.42 ± 0.03</td>
+<td style="text-align: center;">99.15 ± 0.03</td>
+<td style="text-align: center;">99.37 ± 0.06</td>
+<td style="text-align: center;">—</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">CIFAR-100</td>
+<td style="text-align: center;">94.55 ± 0.04</td>
+<td style="text-align: center;">93.90 ± 0.05</td>
+<td style="text-align: center;">93.25 ± 0.05</td>
+<td style="text-align: center;">93.51 ± 0.08</td>
+<td style="text-align: center;">—</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">Oxford-IIIT Pets</td>
+<td style="text-align: center;">97.56 ± 0.03</td>
+<td style="text-align: center;">97.32 ± 0.11</td>
+<td style="text-align: center;">94.67 ± 0.15</td>
+<td style="text-align: center;">96.62 ± 0.23</td>
+<td style="text-align: center;">—</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">Oxford Flowers-102</td>
+<td style="text-align: center;">99.68 ± 0.02</td>
+<td style="text-align: center;">99.74 ± 0.00</td>
+<td style="text-align: center;">99.61 ± 0.02</td>
+<td style="text-align: center;">99.63 ± 0.03</td>
+<td style="text-align: center;">—</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">VTAB（19 任务）</td>
+<td style="text-align: center;">77.63 ± 0.23</td>
+<td style="text-align: center;">76.28 ± 0.46</td>
+<td style="text-align: center;">72.72 ± 0.21</td>
+<td style="text-align: center;">76.29 ± 1.70</td>
+<td style="text-align: center;">—</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">TPUv3 核天数</td>
+<td style="text-align: center;">2.5k</td>
+<td style="text-align: center;">0.68k</td>
+<td style="text-align: center;">0.23k</td>
+<td style="text-align: center;">9.9k</td>
+<td style="text-align: center;">12.3k</td>
+</tr>
+</tbody>
+</table>
+<p><strong>表 2：</strong> 与常用图像分类基准上最先进方法的比较。数值是三次微调运行的准确率均值与标准差。在 JFT-300M 上预训练的 ViT 在所有数据集上都超过了 ResNet 基线，且所需预训练计算资源显著更少。在较小的公开 ImageNet-21k 上预训练的 ViT 也表现良好。* Touvron 等人（2020）报告的小幅改进结果为 88.5%。</p>
+<p>表 2 显示，在 JFT-300M 上预训练的较小 ViT-L/16 在所有任务上都超过使用同一预训练数据集的 BiT-L，同时大幅减少了训练计算量。更大的 ViT-H/14 进一步改善了表现，尤其是在 ImageNet、CIFAR-100 和 VTAB 这些更具挑战性的数据集上。值得注意的是，它的预训练计算量仍显著低于此前的最先进模型。不过，预训练效率除了受架构影响，还可能受训练日程、优化器、权重衰减等超参数影响。第 4.4 节将在受控条件下比较不同架构的性能与计算量。最后，在公开 ImageNet-21k 上预训练的 ViT-L/16 在大多数数据集上也表现出色，而预训练资源更少：用一台标准的 8 核云 TPUv3，约 30 天即可完成训练。</p>
+<img src="/2026/08/28/Vision%20Transformer%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/paste-12.png" srcset="/img/loading.gif" lazyload class="" title="图 2：VTAB 在自然类、专业类与结构类任务组上的性能分解">
+<p>图中将 ViT-H/14 与 BiT、VIVI（在 ImageNet 和 YouTube 上联合训练的 ResNet；Tschannen et al., 2020）以及 S4L（ImageNet 上的监督加半监督学习；Zhai et al., 2019a）比较。ViT-H/14 在自然类和结构类任务上超过 BiT-R152x4 与其他方法；在专业类任务上，最佳两个模型表现相近。</p>
+<h3 id="预训练数据需求">4.3　预训练数据需求</h3>
+<p>ViT 在大型 JFT-300M 上预训练后表现出色。然而，与 ResNet 相比，ViT 针对视觉的归纳偏置更少；数据集规模究竟有多重要？我们做了两组实验。</p>
+<p>第一组实验在规模递增的 ImageNet、ImageNet-21k 和 JFT-300M 上预训练 ViT。为提高在较小数据集上的表现，我们优化了权重衰减、dropout 和标签平滑三个基本正则化参数。图 3 给出微调至 ImageNet 后的结果（其他数据集见表 5）。当只在最小的 ImageNet 上预训练时，即使采用中等强度的正则化，ViT-Large 仍不如 ViT-Base。换成 ImageNet-21k 后，两者表现接近。只有在 JFT-300M 上，更大模型的优势才完全显现。图 3 还显示了不同规模 BiT 模型所覆盖的性能区间：在 ImageNet 上 CNN 优于 ViT，但随着数据集扩大，ViT 会实现反超。需要说明的是，ImageNet 预训练模型后续仍在 ImageNet 上微调，因为微调时提高分辨率可以改善性能。 <img src="/2026/08/28/Vision%20Transformer%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/paste-13.png" srcset="/img/loading.gif" lazyload class="" title="图 3： 迁移至 ImageNet。当预训练数据集较小时，大型 ViT 不如 BiT ResNet（阴影区域）；当数据集足够大时，ViT 则展现出优势。随着数据集扩大，更大的 ViT 变体也会超越较小变体"></p>
+<p>第二组实验在 JFT-300M 中随机抽取 900 万、3000 万和 9000 万样本的子集，并与完整数据集比较。我们没有针对较小子集额外使用正则化，所有设置共用同一组超参数。这样测得的是模型本身的性质，而不是正则化效果。不过，我们使用早停，并报告训练期间达到的最佳验证准确率。为节省计算，这里报告少样本线性准确率，而不是完整微调准确率。图 4 显示，在较小数据集上，ViT 比计算成本相近的 ResNet 更容易过拟合。例如，ViT-B/32 比 ResNet50 稍快；它在 900 万样本子集上明显更差，但在 9000 万及以上样本时反而更好。ResNet152x2 与 ViT-L/16 也呈现同样规律。这一结果再次佐证了我们的直觉：卷积归纳偏置对小型数据集有帮助；但对大型数据集而言，直接从数据中学习相关模式已经足够，甚至更有利。 <img src="/2026/08/28/Vision%20Transformer%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/paste-14.png" srcset="/img/loading.gif" lazyload class="" title="图 4：ImageNet 线性 few-shot 性能与预训练数据规模的关系。在较小预训练集上，ResNet 表现更好，但更早进入平台期；ViT 随预训练规模增长而取得更高性能。ViT-b 是所有隐藏维度减半的 ViT-B"></p>
+<p>总体而言，ImageNet 少样本结果（图 4）和 VTAB 低数据结果（表 2）表明，ViT 在极低数据迁移上颇具潜力。进一步分析 ViT 的少样本特性，是一个令人期待的未来研究方向。</p>
+<h3 id="扩展性研究">4.4　扩展性研究</h3>
+<p>我们通过评估从 JFT-300M 迁移后的性能，对不同模型进行受控扩展研究。在这一设置下，数据规模不会成为性能瓶颈，因此可以考察各模型的性能与预训练成本之比。模型集合包含：7 个 ResNet，即训练 7 个 epoch 的 R50x1、R50x2、R101x1、R152x1、R152x2，以及训练 14 个 epoch 的 R152x2 和 R200x3；6 个 ViT，即训练 7 个 epoch 的 ViT-B/32、B/16、L/32、L/16，以及训练 14 个 epoch 的 L/16 和 H/14；5 个混合模型，即训练 7 个 epoch 的 R50+ViT-B/32、B/16、L/32、L/16，以及训练 14 个 epoch 的 R50+ViT-L/16。在混合模型名称中，末尾数字表示 ResNet 骨干网络的总下采样比，而不是图像块尺寸。 <img src="/2026/08/28/Vision%20Transformer%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/paste-15.png" srcset="/img/loading.gif" lazyload class="" title="图 5：视觉 Transformer、ResNet 与混合模型的性能—预训练计算量关系。在相同计算预算下，ViT 总体优于 ResNet。对较小模型而言，混合架构优于纯 Transformer；随着模型增大，差距随之消失"></p>
+<p>图 5 展示迁移性能与总预训练计算量的关系（计算成本细节见附录 D.5），表 6 则给出各模型的详细结果。可以看出三点规律。第一，在性能—计算量权衡上，ViT 整体优于 ResNet。达到相同性能（五个数据集的平均）时，ViT 所需计算量约少 2–4 倍。第二，在较小计算预算下，混合模型略优于 ViT；但当模型变大，差距就会消失。这有些出乎意料，因为人们可能期待，无论 ViT 规模多大，卷积的局部特征处理都会带来帮助。第三，在本文尝试的规模范围内，ViT 似乎尚未饱和，值得未来继续扩展。</p>
+<h3 id="剖析视觉-transformer">4.5　剖析视觉 Transformer</h3>
+<p>为初步理解 ViT 如何处理图像数据，我们分析了模型的内部表征。ViT 的第一层将展平的图像块线性投影到较低维空间（式 1）。图 7 左侧显示学得的嵌入滤波器的前几个主成分。这些成分很像一组合理的基函数，可用于低维表示图像块内的精细结构。</p>
+<p>投影之后，模型在图像块表征上加入学得的位置嵌入。图 7 中部显示，模型会用位置嵌入之间的相似性编码图像内部距离：距离越近的图像块，位置嵌入通常越相似。模型也会显现行列结构，即同行或同列图像块的嵌入相似。格网较大时，有时还会出现正弦结构（附录 D）。位置嵌入能自行学得二维图像拓扑，这也解释了为什么手工设计的二维感知嵌入不会带来改进（附录 D.4）。</p>
+<p>即使在最底层，自注意力也允许 ViT 整合整幅图像的信息。我们根据注意力权重，计算信息在图像空间中被整合时跨越的平均距离（图 7 右侧），以研究网络实际利用全局整合能力的程度。这种“注意力距离”类似于 CNN 的感受野大小。有些注意力头在最低层已经关注图像的大部分区域，说明模型确实使用了全局信息整合能力。另一些头在低层始终保持很小的注意力距离。在 Transformer 之前先用 ResNet 的混合模型中，这种高度局部化的注意力没有那么明显（图 7 右侧），表明它可能发挥着与 CNN 早期卷积层类似的作用。注意力距离还会随网络深度增加。从全局看，模型会关注与分类语义相关的图像区域（图 6）。 <img src="/2026/08/28/Vision%20Transformer%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/paste-16.png" srcset="/img/loading.gif" lazyload class="" title="图 6：从输出词元到输入空间的代表性注意力示例；详见附录 D.7"> <img src="/2026/08/28/Vision%20Transformer%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/paste-17.png" srcset="/img/loading.gif" lazyload class="" title="图 7：左：ViT-L&#x2F;32 对 RGB 值做初始线性嵌入时的滤波器。中：ViT-L&#x2F;32 的位置嵌入相似度；每个小图显示指定行列图像块的位置嵌入与其他所有图像块位置嵌入的余弦相似度。右：每个注意力头在不同网络深度关注的区域尺寸；每个点是某一层 16 个头中某一头在多张图像上的平均注意力距离。详见附录 D.7"></p>
+<h3 id="自监督学习">4.6　自监督学习</h3>
+<p>Transformer 在 NLP 任务上表现惊人。它们的成功不仅来自良好的扩展性，还得益于大规模自监督预训练（Devlin et al., 2019; Radford et al., 2018）。我们也对用于自监督的遮蔽图像块预测进行了初步探索，以模仿 BERT 中的遮蔽语言建模任务。通过自监督预训练，较小的 ViT-B/16 在 ImageNet 上达到 79.9% 准确率，比从头训练显著提高 2 个百分点，但仍比监督预训练低 4 个百分点。详见附录 B.1.2。对比预训练（Chen et al., 2020b; He et al., 2020; Bachman et al., 2019; Hénaff et al., 2020）留待后续研究。</p>
+<h2 id="结论">5　结论</h2>
+<p>本文探索了将 Transformer 直接用于图像识别的可行性。与此前在计算机视觉中使用自注意力的工作不同，除了最初提取图像块之外，我们没有向架构注入任何图像特定的归纳偏置。我们把图像视为图像块序列，再用 NLP 中使用的标准 Transformer 编码器处理。这一策略简单而且易于扩展；与大型数据集预训练结合后，表现出奇地好。因此，ViT 在众多图像分类数据集上达到或超越最先进水平，而预训练成本相对较低。</p>
+<p>这些初步结果令人鼓舞，但仍有许多挑战。其一是将 ViT 应用于检测和分割等其他计算机视觉任务。本文结果与 Carion 等人（2020）的工作都表明这一方向很有前景。其二是继续探索自监督预训练方法。我们的初步实验显示自监督预训练确有改进，但它与大规模监督预训练之间仍有很大差距。最后，继续扩大 ViT 的规模很可能带来更好性能。</p>
+<h2 id="致谢">致谢</h2>
+<p>本项工作在柏林、苏黎世和阿姆斯特丹完成。我们感谢 Google 的众多同事提供帮助，尤其感谢 Andreas Steiner 对基础设施和代码开源发布提供的关键支持；感谢 Joan Puigcerver 和 Maxim Neumann 对大规模训练基础设施的帮助；感谢 Dmitry Lepikhin、Aravindh Mahendran、Daniel Keysers、Mario Lučić、Noam Shazeer、Ashish Vaswani 和 Colin Raffel 的有益讨论。</p>
+<h2 id="参考文献">参考文献</h2>
+<blockquote>
+<p>参考文献的作者、英文题名、会议名称与出版信息按原文保留。</p>
+</blockquote>
+<ul>
+<li>Abnar, S. and Zuidema, W. Quantifying attention flow in transformers. <em>ACL</em>, 2020.</li>
+<li>Bachman, P., Hjelm, R. D., and Buchwalter, W. Learning representations by maximizing mutual information across views. <em>NeurIPS</em>, 2019.</li>
+<li>Baevski, A. and Auli, M. Adaptive input representations for neural language modeling. <em>ICLR</em>, 2019.</li>
+<li>Bello, I., Zoph, B., Le, Q., Vaswani, A., and Shlens, J. Attention augmented convolutional networks. <em>ICCV</em>, 2019.</li>
+<li>Beyer, L., Hénaff, O. J., Kolesnikov, A., Zhai, X., and van den Oord, A. Are we done with ImageNet? <em>arXiv</em>, 2020.</li>
+<li>Brown, T. B., Mann, B., Ryder, N., Subbiah, M., Kaplan, J., Dhariwal, P., Neelakantan, A., Shyam, P., Sastry, G., Askell, A., et al. Language models are few-shot learners. <em>arXiv</em>, 2020.</li>
+<li>Carion, N., Massa, F., Synnaeve, G., Usunier, N., Kirillov, A., and Zagoruyko, S. End-to-end object detection with transformers. <em>ECCV</em>, 2020.</li>
+<li>Chen, M., Radford, A., Child, R., Wu, J., and Jun, H. Generative pretraining from pixels. <em>ICML</em>, 2020a.</li>
+<li>Chen, T., Kornblith, S., Norouzi, M., and Hinton, G. E. A simple framework for contrastive learning of visual representations. <em>ICML</em>, 2020b.</li>
+<li>Chen, Y.-C., Li, L., Yu, L., El Kholy, A., Ahmed, F., Gan, Z., Cheng, Y., and Liu, J. UNITER: UNiversal Image-TExt Representation Learning. <em>ECCV</em>, 2020c.</li>
+<li>Child, R., Gray, S., Radford, A., and Sutskever, I. Generating long sequences with sparse transformers. <em>arXiv</em>, 2019.</li>
+<li>Cordonnier, J.-B., Loukas, A., and Jaggi, M. On the relationship between self-attention and convolutional layers. <em>ICLR</em>, 2020.</li>
+<li>Deng, J., Dong, W., Socher, R., Li, L., Li, K., and Li, F.-F. ImageNet: A large-scale hierarchical image database. <em>CVPR</em>, 2009.</li>
+<li>Devlin, J., Chang, M.-W., Lee, K., and Toutanova, K. BERT: Pre-training of deep bidirectional transformers for language understanding. <em>NAACL</em>, 2019.</li>
+<li>Djolonga, J., Yung, J., Tschannen, M., Romijnders, R., Beyer, L., Kolesnikov, A., Puigcerver, J., Minderer, M., D’Amour, A., Moldovan, D., Gelly, S., Houlsby, N., Zhai, X., and Lucic, M. On robustness and transferability of convolutional neural networks. <em>arXiv</em>, 2020.</li>
+<li>He, K., Zhang, X., Ren, S., and Sun, J. Deep residual learning for image recognition. <em>CVPR</em>, 2016.</li>
+<li>He, K., Fan, H., Wu, Y., Xie, S., and Girshick, R. Momentum contrast for unsupervised visual representation learning. <em>CVPR</em>, 2020.</li>
+<li>Ho, J., Kalchbrenner, N., Weissenborn, D., and Salimans, T. Axial attention in multidimensional transformers. <em>arXiv</em>, 2019.</li>
+<li>Hu, H., Gu, J., Zhang, Z., Dai, J., and Wei, Y. Relation networks for object detection. <em>CVPR</em>, 2018.</li>
+<li>Hu, H., Zhang, Z., Xie, Z., and Lin, S. Local relation networks for image recognition. <em>ICCV</em>, 2019.</li>
+<li>Huang, Z., Wang, X., Wei, Y., Huang, L., Shi, H., Liu, W., and Huang, T. S. CCNet: Criss-cross attention for semantic segmentation. <em>ICCV</em>, 2020.</li>
+<li>Hénaff, O. J., Srinivas, A., De Fauw, J., Razavi, A., Doersch, C., Eslami, S. M. A., and van den Oord, A. Data-efficient image recognition with contrastive predictive coding. <em>ICML</em>, 2020.</li>
+<li>Ioffe, S. and Szegedy, C. Batch normalization: Accelerating deep network training by reducing internal covariate shift. 2015.</li>
+<li>Kingma, D. P. and Ba, J. Adam: A method for stochastic optimization. <em>ICLR</em>, 2015.</li>
+<li>Kolesnikov, A., Beyer, L., Zhai, X., Puigcerver, J., Yung, J., Gelly, S., and Houlsby, N. Big Transfer (BiT): General visual representation learning. <em>ECCV</em>, 2020.</li>
+<li>Krizhevsky, A. Learning multiple layers of features from tiny images. Technical report, 2009.</li>
+<li>Krizhevsky, A., Sutskever, I., and Hinton, G. E. ImageNet classification with deep convolutional neural networks. <em>NIPS</em>, 2012.</li>
+<li>LeCun, Y., Boser, B., Denker, J., Henderson, D., Howard, R., Hubbard, W., and Jackel, L. Backpropagation applied to handwritten zip code recognition. <em>Neural Computation</em>, 1:541–551, 1989.</li>
+<li>Lepikhin, D., Lee, H., Xu, Y., Chen, D., Firat, O., Huang, Y., Krikun, M., Shazeer, N., and Chen, Z. GShard: Scaling giant models with conditional computation and automatic sharding. <em>arXiv</em>, 2020.</li>
+<li>Li, L. H., Yatskar, M., Yin, D., Hsieh, C.-J., and Chang, K.-W. VisualBERT: A simple and performant baseline for vision and language. <em>arXiv</em>, 2019.</li>
+<li>Locatello, F., Weissenborn, D., Unterthiner, T., Mahendran, A., Heigold, G., Uszkoreit, J., Dosovitskiy, A., and Kipf, T. Object-centric learning with slot attention. <em>arXiv</em>, 2020.</li>
+<li>Lu, J., Batra, D., Parikh, D., and Lee, S. ViLBERT: Pretraining task-agnostic visiolinguistic representations for vision-and-language tasks. <em>NeurIPS</em>, 2019.</li>
+<li>Mahajan, D., Girshick, R., Ramanathan, V., He, K., Paluri, M., Li, Y., Bharambe, A., and van der Maaten, L. Exploring the limits of weakly supervised pretraining. <em>ECCV</em>, 2018.</li>
+<li>Nilsback, M. and Zisserman, A. Automated flower classification over a large number of classes. <em>ICVGIP</em>, 2008.</li>
+<li>Parkhi, O. M., Vedaldi, A., Zisserman, A., and Jawahar, C. V. Cats and dogs. <em>CVPR</em>, 2012.</li>
+<li>Parmar, N., Vaswani, A., Uszkoreit, J., Kaiser, L., Shazeer, N., Ku, A., and Tran, D. Image transformer. <em>ICML</em>, 2018.</li>
+<li>Polyak, B. T. and Juditsky, A. B. Acceleration of stochastic approximation by averaging. <em>SIAM Journal on Control and Optimization</em>, 30(4):838–855, 1992.</li>
+<li>Qiao, S., Wang, H., Liu, C., Shen, W., and Yuille, A. Weight standardization. <em>arXiv:1903.10520</em>, 2019.</li>
+<li>Radford, A., Narasimhan, K., Salimans, T., and Sutskever, I. Improving language understanding with unsupervised learning. Technical report, 2018.</li>
+<li>Radford, A., Wu, J., Child, R., Luan, D., Amodei, D., and Sutskever, I. Language models are unsupervised multitask learners. Technical report, 2019.</li>
+<li>Ramachandran, P., Parmar, N., Vaswani, A., Bello, I., Levskaya, A., and Shlens, J. Stand-alone self-attention in vision models. <em>NeurIPS</em>, 2019.</li>
+<li>Sun, C., Shrivastava, A., Singh, S., and Gupta, A. Revisiting unreasonable effectiveness of data in deep learning era. <em>ICCV</em>, 2017.</li>
+<li>Sun, C., Myers, A., Vondrick, C., Murphy, K., and Schmid, C. VideoBERT: A joint model for video and language representation learning. <em>ICCV</em>, 2019.</li>
+<li>Touvron, H., Vedaldi, A., Douze, M., and Jegou, H. Fixing the train-test resolution discrepancy. <em>NeurIPS</em>, 2019.</li>
+<li>Touvron, H., Vedaldi, A., Douze, M., and Jegou, H. Fixing the train-test resolution discrepancy: FixEfficientNet. <em>arXiv:2003.08237</em>, 2020.</li>
+<li>Tschannen, M., Djolonga, J., Ritter, M., Mahendran, A., Houlsby, N., Gelly, S., and Lucic, M. Self-supervised learning of video-induced visual invariances. <em>CVPR</em>, 2020.</li>
+<li>Vaswani, A., Shazeer, N., Parmar, N., Uszkoreit, J., Jones, L., Gomez, A. N., Kaiser, Ł., and Polosukhin, I. Attention is all you need. <em>NIPS</em>, 2017.</li>
+<li>Wang, H., Zhu, Y., Green, B., Adam, H., Yuille, A., and Chen, L.-C. Axial-DeepLab: Stand-alone axial-attention for panoptic segmentation. <em>ECCV</em>, 2020a.</li>
+<li>Wang, H., Zhu, Y., Green, B., Adam, H., Yuille, A., and Chen, L.-C. Axial-DeepLab: Stand-alone axial-attention for panoptic segmentation. <em>arXiv:2003.07853</em>, 2020b.</li>
+<li>Wang, Q., Li, B., Xiao, T., Zhu, J., Li, C., Wong, D. F., and Chao, L. S. Learning deep transformer models for machine translation. <em>ACL</em>, 2019.</li>
+<li>Wang, X., Girshick, R., Gupta, A., and He, K. Non-local neural networks. <em>CVPR</em>, 2018.</li>
+<li>Weissenborn, D., Täckström, O., and Uszkoreit, J. Scaling autoregressive video models. <em>ICLR</em>, 2019.</li>
+<li>Wu, B., Xu, C., Dai, X., Wan, A., Zhang, P., Tomizuka, M., Keutzer, K., and Vajda, P. Visual transformers: Token-based image representation and processing for computer vision. <em>arXiv</em>, 2020.</li>
+<li>Wu, Y. and He, K. Group normalization. <em>ECCV</em>, 2018.</li>
+<li>Xie, Q., Luong, M.-T., Hovy, E., and Le, Q. V. Self-training with noisy student improves ImageNet classification. <em>CVPR</em>, 2020.</li>
+<li>Zhai, X., Oliver, A., Kolesnikov, A., and Beyer, L. S4L: Self-Supervised Semi-Supervised Learning. <em>ICCV</em>, 2019a.</li>
+<li>Zhai, X., Puigcerver, J., Kolesnikov, A., Ruyssen, P., Riquelme, C., Lucic, M., Djolonga, J., Pinto, A. S., Neumann, M., Dosovitskiy, A., et al. A large-scale study of representation learning with the Visual Task Adaptation Benchmark. <em>arXiv:1910.04867</em>, 2019b.</li>
+<li>Zhao, H., Jia, J., and Koltun, V. Exploring self-attention for image recognition. <em>CVPR</em>, 2020.</li>
+</ul>
+<h1 id="附录">附录</h1>
+<h2 id="a-多头自注意力">A　多头自注意力</h2>
+<p>标准的 qkv 自注意力（self-attention, SA；Vaswani et al., 2017）是神经网络架构中的常用基本模块。对输入序列 <span class="math inline">\(\mathbf{z} \in \mathbf{R}^{N\times D}\)</span> 中的每个元素，我们对序列内的所有值 <span class="math inline">\(\mathbf{v}\)</span> 计算加权和。注意力权重 <span class="math inline">\(A_{ij}\)</span> 由两个序列元素的两两相似度决定，具体是它们各自的查询表征 <span class="math inline">\(\mathbf{q}_i\)</span> 与键表征 <span class="math inline">\(\mathbf{k}_j\)</span>。 <span class="math display">\[ [\mathbf{q}, \mathbf{k}, \mathbf{v}] = z \mathbf{U}_{qkv}, \quad U_{qkv} ∈ R^{D\times 3D_h} 　(5) \]</span> <span class="math display">\[ A = \text{softmax}(\dfrac{\mathbf{q k}^T}{\sqrt{D_h} }), \quad A \in R^{N\times N} 　(6) \]</span> <span class="math display">\[ SA(\mathbf{z}) = A\mathbf{\mathbf{v} } 　(7) \]</span> 多头自注意力（MSA）是 SA 的扩展：我们并行运行 <span class="math inline">\(k\)</span> 个自注意力操作，每个操作称为一个“头”，然后将拼接的输出投影。为在改变 <span class="math inline">\(k\)</span> 时保持计算量和参数量不变，式 5 中的 <span class="math inline">\(D_h\)</span> 通常设为 <span class="math inline">\(D/k\)</span>。 <span class="math display">\[ MSA(\mathbf{z}) = [SA_1(z); SA_2(z); \cdots; SA_k(z)]\mathbf{U}_{msa}, \quad \mathbf{U}_{msa} \in R^{k\cdot D_h\times D} 　(8) \]</span> ## B　实验细节</p>
+<h3 id="b.1-训练">B.1　训练</h3>
+<p>表 3 汇总了各模型的训练设置。当模型在 ImageNet 上从头训练时，强正则化至关重要。如果使用 dropout，则把它放在每个稠密层之后，qkv 投影层除外；图像块嵌入加上位置嵌入之后也立即使用 dropout。混合模型与相应 ViT 使用完全相同的训练设置。所有训练的输入分辨率均为 224。</p>
+<table>
+<thead>
+<tr class="header">
+<th style="text-align: center;">模型</th>
+<th style="text-align: center;">数据集</th>
+<th style="text-align: center;">Epoch</th>
+<th style="text-align: center;">基础学习率</th>
+<th style="text-align: center;">衰减</th>
+<th style="text-align: center;">权重衰减</th>
+<th style="text-align: center;">Dropout</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;">ViT-B/{16,32}</td>
+<td style="text-align: center;">JFT-300M</td>
+<td style="text-align: center;">7</td>
+<td style="text-align: center;">8×10⁻⁴</td>
+<td style="text-align: center;">线性</td>
+<td style="text-align: center;">0.1</td>
+<td style="text-align: center;">0.0</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">ViT-L/32</td>
+<td style="text-align: center;">JFT-300M</td>
+<td style="text-align: center;">7</td>
+<td style="text-align: center;">6×10⁻⁴</td>
+<td style="text-align: center;">线性</td>
+<td style="text-align: center;">0.1</td>
+<td style="text-align: center;">0.0</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">ViT-L/16</td>
+<td style="text-align: center;">JFT-300M</td>
+<td style="text-align: center;">7/14</td>
+<td style="text-align: center;">4×10⁻⁴</td>
+<td style="text-align: center;">线性</td>
+<td style="text-align: center;">0.1</td>
+<td style="text-align: center;">0.0</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">ViT-H/14</td>
+<td style="text-align: center;">JFT-300M</td>
+<td style="text-align: center;">14</td>
+<td style="text-align: center;">3×10⁻⁴</td>
+<td style="text-align: center;">线性</td>
+<td style="text-align: center;">0.1</td>
+<td style="text-align: center;">0.0</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">R50x{1,2}</td>
+<td style="text-align: center;">JFT-300M</td>
+<td style="text-align: center;">7</td>
+<td style="text-align: center;">10⁻³</td>
+<td style="text-align: center;">线性</td>
+<td style="text-align: center;">0.1</td>
+<td style="text-align: center;">0.0</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">R101x1</td>
+<td style="text-align: center;">JFT-300M</td>
+<td style="text-align: center;">7</td>
+<td style="text-align: center;">8×10⁻⁴</td>
+<td style="text-align: center;">线性</td>
+<td style="text-align: center;">0.1</td>
+<td style="text-align: center;">0.0</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">R152x{1,2}</td>
+<td style="text-align: center;">JFT-300M</td>
+<td style="text-align: center;">7</td>
+<td style="text-align: center;">6×10⁻⁴</td>
+<td style="text-align: center;">线性</td>
+<td style="text-align: center;">0.1</td>
+<td style="text-align: center;">0.0</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">R50+ViT-B/{16,32}</td>
+<td style="text-align: center;">JFT-300M</td>
+<td style="text-align: center;">7</td>
+<td style="text-align: center;">8×10⁻⁴</td>
+<td style="text-align: center;">线性</td>
+<td style="text-align: center;">0.1</td>
+<td style="text-align: center;">0.0</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">R50+ViT-L/32</td>
+<td style="text-align: center;">JFT-300M</td>
+<td style="text-align: center;">7</td>
+<td style="text-align: center;">2×10⁻⁴</td>
+<td style="text-align: center;">线性</td>
+<td style="text-align: center;">0.1</td>
+<td style="text-align: center;">0.0</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">R50+ViT-L/16</td>
+<td style="text-align: center;">JFT-300M</td>
+<td style="text-align: center;">7/14</td>
+<td style="text-align: center;">4×10⁻⁴</td>
+<td style="text-align: center;">线性</td>
+<td style="text-align: center;">0.1</td>
+<td style="text-align: center;">0.0</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">ViT-B/{16,32}</td>
+<td style="text-align: center;">ImageNet-21k</td>
+<td style="text-align: center;">90</td>
+<td style="text-align: center;">10⁻³</td>
+<td style="text-align: center;">线性</td>
+<td style="text-align: center;">0.03</td>
+<td style="text-align: center;">0.1</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">ViT-L/{16,32}</td>
+<td style="text-align: center;">ImageNet-21k</td>
+<td style="text-align: center;">30/90</td>
+<td style="text-align: center;">10⁻³</td>
+<td style="text-align: center;">线性</td>
+<td style="text-align: center;">0.03</td>
+<td style="text-align: center;">0.1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">ViT-*</td>
+<td style="text-align: center;">ImageNet</td>
+<td style="text-align: center;">300</td>
+<td style="text-align: center;">3×10⁻³</td>
+<td style="text-align: center;">余弦</td>
+<td style="text-align: center;">0.3</td>
+<td style="text-align: center;">0.1</td>
+</tr>
+</tbody>
+</table>
+<p><strong>表 3：</strong> 训练超参数。所有模型的批大小均为 4096，学习率预热 1 万步。在 ImageNet 上，额外将全局范数梯度裁剪为 1 有利于训练。训练分辨率为 224。</p>
+<h4 id="b.1.1-微调">B.1.1　微调</h4>
+<p>所有 ViT 都使用动量为 0.9 的 SGD 微调。我们对学习率做小规模网格搜索，范围见表 4。具体做法是：从训练集抽取小子集作为开发集（Pets 和 Flowers 为 10%，CIFAR 为 2%，ImageNet 为 1%），用余下数据训练。得到最终结果时，则在完整训练集上训练，并在相应测试集上评估。ResNet 和混合模型使用同样的设置，唯一例外是 ImageNet：学习率搜索中额外加入 0.06。对 ResNet，我们还运行 Kolesnikov 等人（2020）的设置，并在该结果与本文搜索结果中选最佳者。除非特别说明，所有微调实验的分辨率均为 384。</p>
+<table>
+<thead>
+<tr class="header">
+<th style="text-align: center;">数据集</th>
+<th style="text-align: center;">步数</th>
+<th style="text-align: center;">基础学习率</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;">ImageNet</td>
+<td style="text-align: center;">20,000</td>
+<td style="text-align: center;">{0.003, 0.01, 0.03, 0.06}</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">CIFAR-100</td>
+<td style="text-align: center;">10,000</td>
+<td style="text-align: center;">{0.001, 0.003, 0.01, 0.03}</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">CIFAR-10</td>
+<td style="text-align: center;">10,000</td>
+<td style="text-align: center;">{0.001, 0.003, 0.01, 0.03}</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">Oxford-IIIT Pets</td>
+<td style="text-align: center;">500</td>
+<td style="text-align: center;">{0.001, 0.003, 0.01, 0.03}</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">Oxford Flowers-102</td>
+<td style="text-align: center;">500</td>
+<td style="text-align: center;">{0.001, 0.003, 0.01, 0.03}</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">VTAB（19 项任务）</td>
+<td style="text-align: center;">2,500</td>
+<td style="text-align: center;">0.01</td>
+</tr>
+</tbody>
+</table>
+<p><strong>表 4：</strong> 微调超参数。所有模型均使用余弦学习率衰减，批大小为 512，不使用权重衰减，全局范数梯度裁剪为 1。除非特别说明，微调分辨率为 384。</p>
+<p>将 ViT 迁移到其他数据集时，我们删除整个预测头（两个线性层），换成输出维数等于目标数据集类别数的单个零初始化线性层。我们发现，这比只重新初始化最后一层稍稳健。VTAB 遵循 Kolesnikov 等人（2020）的协议，所有任务使用同一组超参数：学习率 0.01，训练 2500 步。我们在两个学习率和两个训练日程上做小规模搜索，按每项任务 200 样本的验证集得分选定这一设置。预处理与 Kolesnikov 等人（2020）相同，但不使用任务特定分辨率；ViT 在所有任务上都从较高的 384×384 分辨率中受益最多。</p>
+<h4 id="b.1.2-自监督学习">B.1.2　自监督学习</h4>
+<p>初步自监督实验采用遮蔽图像块预测目标。我们破坏 50% 的图像块嵌入：80% 替换为可学习的 <code>[mask]</code> 嵌入，10% 替换为其他随机图像块嵌入，余下 10% 保持不变。这与 Devlin 等人（2019）的语言设置非常相似。最后，根据每个被破坏图像块的表征，预测它的 3-bit 平均颜色（共 512 种颜色）。</p>
+<p>自监督模型在 JFT 上训练 100 万步（约 14 个 epoch），批大小 4096。优化器为 Adam，基础学习率 <span class="math inline">\(2\times 10^{-4}\)</span>，预热 1 万步，采用余弦衰减。我们比较了三种预训练目标：</p>
+<ol type="1">
+<li>只预测平均 3-bit 颜色，即一次在 512 种颜色中预测；</li>
+<li>将 16×16 图像块缩小为 4×4，并行预测 3-bit 颜色，即做 16 次 512 类预测；</li>
+<li>使用 L2 对完整图像块做回归，即对 3 个 RGB 通道做 256 组回归。</li>
+</ol>
+<p>令人惊讶的是，三种方法表现都很好，只有 L2 略差。由于方案 1 的少样本性能最好，我们只报告它的最终结果。我们也尝试了 Devlin 等人（2019）所用的 15% 破坏率，但少样本指标略差。</p>
+<p>最后需要说明，我们实现的遮蔽图像块预测并不需要如此庞大的预训练量，也不必使用 JFT 这样的大型数据集，就能在 ImageNet 分类上取得相近改进。我们观察到，预训练超过 10 万步后，下游性能的边际收益已经减少；只在 ImageNet 上预训练也能获得相似改进。</p>
+<h2 id="c-补充结果">C　补充结果</h2>
+<p>本节报告正文各图对应的详细数值。表 5 对应正文图 3，展示不同 ViT 在 ImageNet、ImageNet-21k 和 JFT-300M 三种规模递增的数据集上预训练后的迁移性能。</p>
+<table>
+<thead>
+<tr class="header">
+<th style="text-align: center;">预训练</th>
+<th style="text-align: center;">下游数据集</th>
+<th style="text-align: center;">ViT-B/16</th>
+<th style="text-align: center;">ViT-B/32</th>
+<th style="text-align: center;">ViT-L/16</th>
+<th style="text-align: center;">ViT-L/32</th>
+<th style="text-align: center;">ViT-H/14</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;">ImageNet</td>
+<td style="text-align: center;">CIFAR-10</td>
+<td style="text-align: center;">98.13</td>
+<td style="text-align: center;">97.77</td>
+<td style="text-align: center;">97.86</td>
+<td style="text-align: center;">97.94</td>
+<td style="text-align: center;">—</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">ImageNet</td>
+<td style="text-align: center;">CIFAR-100</td>
+<td style="text-align: center;">87.13</td>
+<td style="text-align: center;">86.31</td>
+<td style="text-align: center;">86.35</td>
+<td style="text-align: center;">87.07</td>
+<td style="text-align: center;">—</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">ImageNet</td>
+<td style="text-align: center;">ImageNet</td>
+<td style="text-align: center;">77.91</td>
+<td style="text-align: center;">73.38</td>
+<td style="text-align: center;">76.53</td>
+<td style="text-align: center;">71.16</td>
+<td style="text-align: center;">—</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">ImageNet</td>
+<td style="text-align: center;">ImageNet ReaL</td>
+<td style="text-align: center;">83.57</td>
+<td style="text-align: center;">79.56</td>
+<td style="text-align: center;">82.19</td>
+<td style="text-align: center;">77.83</td>
+<td style="text-align: center;">—</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">ImageNet</td>
+<td style="text-align: center;">Flowers-102</td>
+<td style="text-align: center;">89.49</td>
+<td style="text-align: center;">85.43</td>
+<td style="text-align: center;">89.66</td>
+<td style="text-align: center;">86.36</td>
+<td style="text-align: center;">—</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">ImageNet</td>
+<td style="text-align: center;">Oxford-IIIT Pets</td>
+<td style="text-align: center;">93.81</td>
+<td style="text-align: center;">92.04</td>
+<td style="text-align: center;">93.64</td>
+<td style="text-align: center;">91.35</td>
+<td style="text-align: center;">—</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">ImageNet-21k</td>
+<td style="text-align: center;">CIFAR-10</td>
+<td style="text-align: center;">98.95</td>
+<td style="text-align: center;">98.79</td>
+<td style="text-align: center;">99.16</td>
+<td style="text-align: center;">99.13</td>
+<td style="text-align: center;">99.27</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">ImageNet-21k</td>
+<td style="text-align: center;">CIFAR-100</td>
+<td style="text-align: center;">91.67</td>
+<td style="text-align: center;">91.97</td>
+<td style="text-align: center;">93.44</td>
+<td style="text-align: center;">93.04</td>
+<td style="text-align: center;">93.82</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">ImageNet-21k</td>
+<td style="text-align: center;">ImageNet</td>
+<td style="text-align: center;">83.97</td>
+<td style="text-align: center;">81.28</td>
+<td style="text-align: center;">85.15</td>
+<td style="text-align: center;">80.99</td>
+<td style="text-align: center;">85.13</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">ImageNet-21k</td>
+<td style="text-align: center;">ImageNet ReaL</td>
+<td style="text-align: center;">88.35</td>
+<td style="text-align: center;">86.63</td>
+<td style="text-align: center;">88.40</td>
+<td style="text-align: center;">85.65</td>
+<td style="text-align: center;">88.70</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">ImageNet-21k</td>
+<td style="text-align: center;">Flowers-102</td>
+<td style="text-align: center;">99.38</td>
+<td style="text-align: center;">99.11</td>
+<td style="text-align: center;">99.61</td>
+<td style="text-align: center;">99.19</td>
+<td style="text-align: center;">99.51</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">ImageNet-21k</td>
+<td style="text-align: center;">Oxford-IIIT Pets</td>
+<td style="text-align: center;">94.43</td>
+<td style="text-align: center;">93.02</td>
+<td style="text-align: center;">94.73</td>
+<td style="text-align: center;">93.09</td>
+<td style="text-align: center;">94.82</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">JFT-300M</td>
+<td style="text-align: center;">CIFAR-10</td>
+<td style="text-align: center;">99.00</td>
+<td style="text-align: center;">98.61</td>
+<td style="text-align: center;">99.38</td>
+<td style="text-align: center;">99.19</td>
+<td style="text-align: center;">99.50</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">JFT-300M</td>
+<td style="text-align: center;">CIFAR-100</td>
+<td style="text-align: center;">91.87</td>
+<td style="text-align: center;">90.49</td>
+<td style="text-align: center;">94.04</td>
+<td style="text-align: center;">92.52</td>
+<td style="text-align: center;">94.55</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">JFT-300M</td>
+<td style="text-align: center;">ImageNet</td>
+<td style="text-align: center;">84.15</td>
+<td style="text-align: center;">80.73</td>
+<td style="text-align: center;">87.12</td>
+<td style="text-align: center;">84.37</td>
+<td style="text-align: center;">88.04</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">JFT-300M</td>
+<td style="text-align: center;">ImageNet ReaL</td>
+<td style="text-align: center;">88.85</td>
+<td style="text-align: center;">86.27</td>
+<td style="text-align: center;">89.99</td>
+<td style="text-align: center;">88.28</td>
+<td style="text-align: center;">90.33</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">JFT-300M</td>
+<td style="text-align: center;">Flowers-102</td>
+<td style="text-align: center;">99.56</td>
+<td style="text-align: center;">99.27</td>
+<td style="text-align: center;">99.56</td>
+<td style="text-align: center;">99.45</td>
+<td style="text-align: center;">99.68</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">JFT-300M</td>
+<td style="text-align: center;">Oxford-IIIT Pets</td>
+<td style="text-align: center;">95.80</td>
+<td style="text-align: center;">93.40</td>
+<td style="text-align: center;">97.11</td>
+<td style="text-align: center;">95.83</td>
+<td style="text-align: center;">97.56</td>
+</tr>
+</tbody>
+</table>
+<p><strong>表 5：</strong> ViT 在 ImageNet、ImageNet-21k 或 JFT-300M 上预训练后，迁移到各数据集的 Top-1 准确率（%）。数值对应正文图 3。模型以 384 分辨率微调。ImageNet 结果未使用表 2 为获得最佳成绩而加入的技巧（Polyak 平均和 512 分辨率）。</p>
+<p>表 6 对应正文图 5，给出不同规模 ViT、ResNet 与混合模型的迁移准确率和估计预训练计算成本。</p>
+<table>
+<thead>
+<tr class="header">
+<th style="text-align: center;">模型</th>
+<th style="text-align: center;">Epoch</th>
+<th style="text-align: center;">IN</th>
+<th style="text-align: center;">ReaL</th>
+<th style="text-align: center;">C10</th>
+<th style="text-align: center;">C100</th>
+<th style="text-align: center;">Pets</th>
+<th style="text-align: center;">Flowers</th>
+<th style="text-align: center;">exaFLOPs</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;">ViT-B/32</td>
+<td style="text-align: center;">7</td>
+<td style="text-align: center;">80.73</td>
+<td style="text-align: center;">86.27</td>
+<td style="text-align: center;">98.61</td>
+<td style="text-align: center;">90.49</td>
+<td style="text-align: center;">93.40</td>
+<td style="text-align: center;">99.27</td>
+<td style="text-align: center;">55</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">ViT-B/16</td>
+<td style="text-align: center;">7</td>
+<td style="text-align: center;">84.15</td>
+<td style="text-align: center;">88.85</td>
+<td style="text-align: center;">99.00</td>
+<td style="text-align: center;">91.87</td>
+<td style="text-align: center;">95.80</td>
+<td style="text-align: center;">99.56</td>
+<td style="text-align: center;">224</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">ViT-L/32</td>
+<td style="text-align: center;">7</td>
+<td style="text-align: center;">84.37</td>
+<td style="text-align: center;">88.28</td>
+<td style="text-align: center;">99.19</td>
+<td style="text-align: center;">92.52</td>
+<td style="text-align: center;">95.83</td>
+<td style="text-align: center;">99.45</td>
+<td style="text-align: center;">196</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">ViT-L/16</td>
+<td style="text-align: center;">7</td>
+<td style="text-align: center;">86.30</td>
+<td style="text-align: center;">89.43</td>
+<td style="text-align: center;">99.38</td>
+<td style="text-align: center;">93.46</td>
+<td style="text-align: center;">96.81</td>
+<td style="text-align: center;">99.66</td>
+<td style="text-align: center;">783</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">ViT-L/16</td>
+<td style="text-align: center;">14</td>
+<td style="text-align: center;">87.12</td>
+<td style="text-align: center;">89.99</td>
+<td style="text-align: center;">99.38</td>
+<td style="text-align: center;">94.04</td>
+<td style="text-align: center;">97.11</td>
+<td style="text-align: center;">99.56</td>
+<td style="text-align: center;">1567</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">ViT-H/14</td>
+<td style="text-align: center;">14</td>
+<td style="text-align: center;">88.08</td>
+<td style="text-align: center;">90.36</td>
+<td style="text-align: center;">99.50</td>
+<td style="text-align: center;">94.71</td>
+<td style="text-align: center;">97.11</td>
+<td style="text-align: center;">99.71</td>
+<td style="text-align: center;">4262</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">ResNet50x1</td>
+<td style="text-align: center;">7</td>
+<td style="text-align: center;">77.54</td>
+<td style="text-align: center;">84.56</td>
+<td style="text-align: center;">97.67</td>
+<td style="text-align: center;">86.07</td>
+<td style="text-align: center;">91.11</td>
+<td style="text-align: center;">94.26</td>
+<td style="text-align: center;">50</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">ResNet50x2</td>
+<td style="text-align: center;">7</td>
+<td style="text-align: center;">82.12</td>
+<td style="text-align: center;">87.94</td>
+<td style="text-align: center;">98.29</td>
+<td style="text-align: center;">89.20</td>
+<td style="text-align: center;">93.43</td>
+<td style="text-align: center;">97.02</td>
+<td style="text-align: center;">199</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">ResNet101x1</td>
+<td style="text-align: center;">7</td>
+<td style="text-align: center;">80.67</td>
+<td style="text-align: center;">87.07</td>
+<td style="text-align: center;">98.48</td>
+<td style="text-align: center;">89.17</td>
+<td style="text-align: center;">94.08</td>
+<td style="text-align: center;">95.95</td>
+<td style="text-align: center;">96</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">ResNet152x1</td>
+<td style="text-align: center;">7</td>
+<td style="text-align: center;">81.88</td>
+<td style="text-align: center;">87.96</td>
+<td style="text-align: center;">98.82</td>
+<td style="text-align: center;">90.22</td>
+<td style="text-align: center;">94.17</td>
+<td style="text-align: center;">96.94</td>
+<td style="text-align: center;">141</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">ResNet152x2</td>
+<td style="text-align: center;">7</td>
+<td style="text-align: center;">84.97</td>
+<td style="text-align: center;">89.69</td>
+<td style="text-align: center;">99.06</td>
+<td style="text-align: center;">92.05</td>
+<td style="text-align: center;">95.37</td>
+<td style="text-align: center;">98.62</td>
+<td style="text-align: center;">563</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">ResNet152x2</td>
+<td style="text-align: center;">14</td>
+<td style="text-align: center;">85.56</td>
+<td style="text-align: center;">89.89</td>
+<td style="text-align: center;">99.24</td>
+<td style="text-align: center;">91.92</td>
+<td style="text-align: center;">95.75</td>
+<td style="text-align: center;">98.75</td>
+<td style="text-align: center;">1126</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">ResNet200x3</td>
+<td style="text-align: center;">14</td>
+<td style="text-align: center;">87.22</td>
+<td style="text-align: center;">90.15</td>
+<td style="text-align: center;">99.34</td>
+<td style="text-align: center;">93.53</td>
+<td style="text-align: center;">96.32</td>
+<td style="text-align: center;">99.04</td>
+<td style="text-align: center;">3306</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">R50x1+ViT-B/32</td>
+<td style="text-align: center;">7</td>
+<td style="text-align: center;">84.90</td>
+<td style="text-align: center;">89.15</td>
+<td style="text-align: center;">99.01</td>
+<td style="text-align: center;">92.24</td>
+<td style="text-align: center;">95.75</td>
+<td style="text-align: center;">99.46</td>
+<td style="text-align: center;">106</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">R50x1+ViT-B/16</td>
+<td style="text-align: center;">7</td>
+<td style="text-align: center;">85.58</td>
+<td style="text-align: center;">89.65</td>
+<td style="text-align: center;">99.14</td>
+<td style="text-align: center;">92.63</td>
+<td style="text-align: center;">96.65</td>
+<td style="text-align: center;">99.40</td>
+<td style="text-align: center;">274</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">R50x1+ViT-L/32</td>
+<td style="text-align: center;">7</td>
+<td style="text-align: center;">85.68</td>
+<td style="text-align: center;">89.04</td>
+<td style="text-align: center;">99.24</td>
+<td style="text-align: center;">92.93</td>
+<td style="text-align: center;">96.97</td>
+<td style="text-align: center;">99.43</td>
+<td style="text-align: center;">246</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">R50x1+ViT-L/16</td>
+<td style="text-align: center;">7</td>
+<td style="text-align: center;">86.60</td>
+<td style="text-align: center;">89.72</td>
+<td style="text-align: center;">99.18</td>
+<td style="text-align: center;">93.64</td>
+<td style="text-align: center;">97.03</td>
+<td style="text-align: center;">99.40</td>
+<td style="text-align: center;">859</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">R50x1+ViT-L/16</td>
+<td style="text-align: center;">14</td>
+<td style="text-align: center;">87.12</td>
+<td style="text-align: center;">89.76</td>
+<td style="text-align: center;">99.31</td>
+<td style="text-align: center;">93.89</td>
+<td style="text-align: center;">97.36</td>
+<td style="text-align: center;">99.11</td>
+<td style="text-align: center;">1668</td>
+</tr>
+</tbody>
+</table>
+<p><strong>表 6：</strong> 模型扩展实验的详细结果，对应正文图 5。表中 <code>IN</code>、<code>C10</code>、<code>C100</code> 分别指 ImageNet、CIFAR-10 和 CIFAR-100；exaFLOPs 表示预训练计算量。</p>
+<h2 id="d-补充分析">D　补充分析</h2>
+<h3 id="d.1-resnet-使用-sgd-还是-adam">D.1　ResNet 使用 SGD 还是 Adam</h3>
+<p>ResNet 通常用 SGD 训练，因此本文使用 Adam 并不常见。下面给出支持这一选择的实验。我们比较了两个在 JFT 上分别用 SGD 和 Adam 预训练的 ResNet：50x1 与 152x2。SGD 使用 Kolesnikov 等人（2020）推荐的超参数。</p>
+<table>
+<thead>
+<tr class="header">
+<th>数据集</th>
+<th style="text-align: right;">R50 Adam</th>
+<th style="text-align: right;">R50 SGD</th>
+<th style="text-align: right;">R152x2 Adam</th>
+<th style="text-align: right;">R152x2 SGD</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>ImageNet</td>
+<td style="text-align: right;">77.54</td>
+<td style="text-align: right;">78.24</td>
+<td style="text-align: right;">84.97</td>
+<td style="text-align: right;">84.37</td>
+</tr>
+<tr class="even">
+<td>CIFAR-10</td>
+<td style="text-align: right;">97.67</td>
+<td style="text-align: right;">97.46</td>
+<td style="text-align: right;">99.06</td>
+<td style="text-align: right;">99.07</td>
+</tr>
+<tr class="odd">
+<td>CIFAR-100</td>
+<td style="text-align: right;">86.07</td>
+<td style="text-align: right;">85.17</td>
+<td style="text-align: right;">92.05</td>
+<td style="text-align: right;">91.06</td>
+</tr>
+<tr class="even">
+<td>Oxford-IIIT Pets</td>
+<td style="text-align: right;">91.11</td>
+<td style="text-align: right;">91.00</td>
+<td style="text-align: right;">95.37</td>
+<td style="text-align: right;">94.79</td>
+</tr>
+<tr class="odd">
+<td>Oxford Flowers-102</td>
+<td style="text-align: right;">94.26</td>
+<td style="text-align: right;">92.06</td>
+<td style="text-align: right;">98.62</td>
+<td style="text-align: right;">99.32</td>
+</tr>
+<tr class="even">
+<td>平均</td>
+<td style="text-align: right;">89.33</td>
+<td style="text-align: right;">88.79</td>
+<td style="text-align: right;">94.01</td>
+<td style="text-align: right;">93.72</td>
+</tr>
+</tbody>
+</table>
+<p><strong>表 7：</strong> 用 Adam 与 SGD 预训练的 ResNet 微调结果。</p>
+<p>表 7 显示，Adam 预训练在大多数数据集上以及平均而言都优于 SGD，因此我们选择 Adam 在 JFT 上预训练 ResNet。请注意，这里的绝对数值低于 Kolesnikov 等人（2020），因为本文只预训练 7 个 epoch，而非 30 个。</p>
+<h3 id="d.2-transformer-的形状">D.2　Transformer 的形状</h3>
+<p>为了找出哪些 Transformer 架构维度最适合扩展到超大模型，我们对不同维度的扩展方式做了消融实验。图 8 展示不同配置在 ImageNet 上的 5-shot 性能。所有配置都基于一个 8 层、<span class="math inline">\(D=1024\)</span>、<span class="math inline">\(D_{MLP}=2048\)</span>、图像块尺寸为 32 的 ViT，即图中所有曲线的交点。</p>
+<p>增加深度带来的改进最大，直到 64 层仍清晰可见；但在 16 层之后，边际收益已开始减少。有趣的是，增加网络宽度带来的变化最小。减小图像块，从而增加有效序列长度，在不增加参数的情况下带来了出乎意料的稳健改进。这些发现表明，计算量可能比参数量更能预测性能；若有所侧重，扩展深度比扩展宽度更值得优先考虑。总的来说，按比例扩展所有维度可以稳健改善性能。 <img src="/2026/08/28/Vision%20Transformer%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/paste-24.png" srcset="/img/loading.gif" lazyload class="" title="图 8：扩展 ViT 不同结构维度时的性能变化"></p>
+<h3 id="d.3-分类头类型与-class-词元">D.3　分类头类型与 <code>[class]</code> 词元</h3>
+<p>为尽可能贴近原始 Transformer，我们加入了一个 <code>[class]</code> 词元，并把它作为图像表征。该词元的输出经过一个小型 MLP，转换为类别预测；MLP 含一个隐藏层，并用 tanh 作非线性激活。</p>
+<p>这一设计继承自文本 Transformer，正文的所有实验均采用它。我们最初也尝试只使用图像块嵌入，对其做全局平均池化（GAP），再接线性分类器——这与 ResNet 对最后一张特征图的处理相同——但结果很差。后续实验发现，问题既不在额外词元，也不在 GAP 操作；性能差异完全可用所需学习率不同来解释（图 9）。 <img src="/2026/08/28/Vision%20Transformer%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/paste-23.png" srcset="/img/loading.gif" lazyload class="" title="图 9：分类词元与全局平均池化分类器的比较。两者的最佳性能相似，但需要不同的学习率"></p>
+<h3 id="d.4-位置嵌入">D.4　位置嵌入</h3>
+<p>我们对用位置嵌入编码空间信息的不同方式做了消融实验，包括：</p>
+<ul>
+<li><strong>不提供位置信息：</strong> 将输入视为无序的图像块集合。</li>
+<li><strong>一维位置嵌入：</strong> 按光栅扫描顺序将输入视为图像块序列。这是本文其他所有实验的默认设置。</li>
+<li><strong>二维位置嵌入：</strong> 将输入视为二维图像块网格。模型分别学习两个轴的 X 嵌入和 Y 嵌入，它们的大小均为 <span class="math inline">\(D/2\)</span>。根据图像块在输入中的坐标，拼接 X 和 Y 嵌入，得到最终位置嵌入。</li>
+<li><strong>相对位置嵌入：</strong> 用图像块之间的相对距离，而非绝对位置，编码空间信息。我们使用一维相对注意力，为所有可能的图像块对定义相对距离。对每一对图像块（一个作查询，另一个作键/值），得到偏移 <span class="math inline">\(p_q−p_k\)</span>，并为每个偏移配一个嵌入。随后运行额外注意力：查询仍是原始内容查询，键则使用相对位置嵌入。相对注意力的 logits 作为偏置项，在 softmax 之前加到主注意力（基于内容）的 logits 上。</li>
+</ul>
+<p>除了不同空间编码方式，我们还尝试了不同的注入位置。对一维和二维位置嵌入，比较三种方案：（1）在模型起始端将位置嵌入加到输入上，然后再输入 Transformer 编码器，这是本文其他实验的默认设置；（2）在每一层开始时学习并加入位置嵌入；（3）在每层开始时加入学得的位置嵌入，但各层共享同一组嵌入。</p>
+<table>
+<thead>
+<tr class="header">
+<th style="text-align: center;">位置嵌入</th>
+<th style="text-align: center;">默认/起始端</th>
+<th style="text-align: center;">每层</th>
+<th style="text-align: center;">每层共享</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;">无位置嵌入</td>
+<td style="text-align: center;">0.61382</td>
+<td style="text-align: center;">不适用</td>
+<td style="text-align: center;">不适用</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">一维位置嵌入</td>
+<td style="text-align: center;">0.64206</td>
+<td style="text-align: center;">0.63964</td>
+<td style="text-align: center;">0.64292</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">二维位置嵌入</td>
+<td style="text-align: center;">0.64001</td>
+<td style="text-align: center;">0.64046</td>
+<td style="text-align: center;">0.64022</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">相对位置嵌入</td>
+<td style="text-align: center;">0.64032</td>
+<td style="text-align: center;">不适用</td>
+<td style="text-align: center;">不适用</td>
+</tr>
+</tbody>
+</table>
+<p><strong>表 8：</strong> ViT-B/16 的位置嵌入消融结果，评估指标为 ImageNet 线性 5-shot 性能。</p>
+<p>表 8 表明，不使用位置嵌入与使用位置嵌入之间有明显性能差距，但不同空间编码方式几乎没有差异。我们推测，这是因为 Transformer 编码器处理的是图像块级输入，而非像素级输入。图像块级输入的空间维度比原始像素级输入小得多，例如 14×14 而非 224×224。在这一分辨率上，几种策略学习空间关系的难度相当。即便如此，网络学得的位置嵌入相似度模式仍会受训练超参数影响（图 10）。 <img src="/2026/08/28/Vision%20Transformer%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/paste-22.png" srcset="/img/loading.gif" lazyload class="" title="图 10： 使用不同超参数训练的模型所学得的位置嵌入"> <img src="/2026/08/28/Vision%20Transformer%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/paste-21.png" srcset="/img/loading.gif" lazyload class="" title="图 11：注意力头在不同网络深度关注的区域尺寸。使用 128 张示例图像，按注意力权重对查询像素到其他所有像素的距离加权平均，得到注意力距离。每个点代表某一层 16 个头中的一个头在多张图像上的平均距离。图像宽度为 224 像素"></p>
+<h3 id="d.5-实际计算成本">D.5　实际计算成本</h3>
+<p>我们还关心各架构在实际硬件上的速度。由于通道宽度、缓存尺寸等实现细节，理论 FLOPs 并不总能准确预测实际速度。因此，我们在 TPUv3 加速器上测量了主要模型的推理速度；推理与反向传播速度之差可视为与模型无关的常数因子。</p>
+<p>图 12 左侧显示在不同输入尺寸下，每个核每秒可处理的图像数。每个点都是在广泛的批大小范围内测得的峰值性能。可以看到，ViT 对图像尺寸的理论双二次扩展趋势，只在最大模型与最高分辨率下才刚开始显现。</p>
+<p>另一个值得关注的量是，每个核能容纳的最大批大小。该值越大，模型越容易扩展到大型数据集。图 12 右侧显示同一组模型的这一指标。结果表明，在内存效率上，大型 ViT 相比 ResNet 具有明显优势。 <img src="/2026/08/28/Vision%20Transformer%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/paste-20.png" srcset="/img/loading.gif" lazyload class="" title="图 12：左：不同架构在各输入尺寸下的真实墙钟时间。ViT 的速度与相近 ResNet 可比。右：各架构在不同输入尺寸下能在设备上容纳的最大单核批大小。ViT 的内存效率明显更高"></p>
+<h3 id="d.6-轴向注意力">D.6　轴向注意力</h3>
+<p>轴向注意力（Axial Attention；Huang et al., 2020; Ho et al., 2019）是一种简单而有效的方法，可对按多维张量组织的大型输入运行自注意力。其核心思路是：不对展平后的一维输入做注意力，而是执行多次注意力操作，每次只沿输入张量的一个轴进行。每次注意力只混合特定轴向上的信息，其他轴上的信息保持独立。Wang 等人（2020b）由此提出 AxialResNet：将 ResNet50 中所有 3×3 卷积换成带相对位置编码的轴向自注意力，即行注意力加列注意力。我们实现了 AxialResNet 作为基线。</p>
+<p>我们还修改了 ViT，使其以二维形式处理输入，而不是一维图像块序列；同时引入 Axial Transformer 块，将“自注意力 + MLP”换成“行自注意力 + MLP，然后列自注意力 + MLP”。</p>
+<p>图 13 展示 AxialResNet、Axial-ViT-B/32 和 Axial-ViT-B/16 在 JFT 上预训练后，ImageNet 线性 5-shot 性能与预训练计算量的关系。计算成本分别用 FLOPs 和推理速度（每秒样本数）表示。Axial-ViT-B/32 和 Axial-ViT-B/16 的性能都优于相应 ViT-B，但代价是更多计算。这是因为 Axial-ViT 把每个全局自注意力 Transformer 块换成两个轴向 Transformer 块，一个处理行，一个处理列。轴向自注意力的序列更短，但每个 Axial-ViT 块多出一个 MLP。AxialResNet 的准确率—计算量权衡看似合理（图 13 左），但朴素实现在 TPU 上极慢（图 13 右）。 <img src="/2026/08/28/Vision%20Transformer%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/paste-19.png" srcset="/img/loading.gif" lazyload class="" title="图 13：轴向注意力模型在 ImageNet 线性 5-shot 上的 Top-1 准确率，与 FLOPs（左）和实际推理速度（右）的关系"></p>
+<blockquote>
+<p>我们的实现基于开源 PyTorch 代码 <a target="_blank" rel="noopener" href="https://github.com/csrhddlam/axial-deeplab">Axial-DeepLab</a>。实验复现了 Wang 等人（2020b）报告的准确率，但同开源版一样，该实现在 TPU 上很慢，无法用于大量大规模实验。细致优化实现后，这一局限有望解除。</p>
+</blockquote>
+<h3 id="d.7-注意力距离">D.7　注意力距离</h3>
+<p>为理解 ViT 如何用自注意力整合整幅图像的信息，我们分析了各层注意力权重跨越的平均距离（图 11）。这种“注意力距离”类似于 CNN 的感受野大小。在低层，不同头的平均注意力距离差异很大：有些头关注图像的大部分区域，另一些只关注查询位置附近的小区域。随着网络加深，所有头的注意力距离都会增加。到网络后半段，大多数头都会广泛关注各词元。</p>
+<h3 id="d.8-注意力图">D.8　注意力图</h3>
+<p>为计算从输出词元到输入空间的注意力图（图 6 和图 14），我们使用 Attention Rollout（Abnar &amp; Zuidema, 2020）。简言之，首先对 ViT-L/16 所有头的注意力权重取平均，然后递归相乘所有层的权重矩阵。这样可以把注意力在各层词元之间的混合纳入考虑。</p>
+<p><strong>图 14：</strong> 与图 6 相同的更多注意力图示例，样本为随机选取。</p>
+<h3 id="d.9-objectnet-结果">D.9　ObjectNet 结果</h3>
+<p>我们还按照 Kolesnikov 等人（2020）的评估设置，在 ObjectNet 基准上评估了代表性模型 ViT-H/14。该模型取得 82.1% 的 Top-5 准确率和 61.7% 的 Top-1 准确率。3</p>
+<h3 id="d.10-vtab-分项结果">D.10　VTAB 分项结果</h3>
+<p>表 9 列出每项 VTAB-1k 任务的得分。为便于在 A4 页面上阅读，分为两个子表。</p>
+<table>
+<thead>
+<tr class="header">
+<th style="text-align: center;">模型</th>
+<th style="text-align: center;">Caltech101</th>
+<th style="text-align: center;">CIFAR-100</th>
+<th style="text-align: center;">DTD</th>
+<th style="text-align: center;">Flowers102</th>
+<th style="text-align: center;">Pets</th>
+<th style="text-align: center;">Sun397</th>
+<th style="text-align: center;">SVHN</th>
+<th style="text-align: center;">Camelyon</th>
+<th style="text-align: center;">EuroSAT</th>
+<th style="text-align: center;">Resisc45</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;">ViT-H/14 (JFT)</td>
+<td style="text-align: center;">95.3</td>
+<td style="text-align: center;">85.5</td>
+<td style="text-align: center;">75.2</td>
+<td style="text-align: center;">99.7</td>
+<td style="text-align: center;">97.2</td>
+<td style="text-align: center;">65.0</td>
+<td style="text-align: center;">88.9</td>
+<td style="text-align: center;">83.3</td>
+<td style="text-align: center;">96.7</td>
+<td style="text-align: center;">91.4</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">ViT-L/16 (JFT)</td>
+<td style="text-align: center;">95.4</td>
+<td style="text-align: center;">81.9</td>
+<td style="text-align: center;">74.3</td>
+<td style="text-align: center;">99.7</td>
+<td style="text-align: center;">96.7</td>
+<td style="text-align: center;">63.5</td>
+<td style="text-align: center;">87.4</td>
+<td style="text-align: center;">83.6</td>
+<td style="text-align: center;">96.5</td>
+<td style="text-align: center;">89.7</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">ViT-L/16 (I21k)</td>
+<td style="text-align: center;">90.8</td>
+<td style="text-align: center;">84.1</td>
+<td style="text-align: center;">74.1</td>
+<td style="text-align: center;">99.3</td>
+<td style="text-align: center;">92.7</td>
+<td style="text-align: center;">61.0</td>
+<td style="text-align: center;">80.9</td>
+<td style="text-align: center;">82.5</td>
+<td style="text-align: center;">95.6</td>
+<td style="text-align: center;">85.2</td>
+</tr>
+</tbody>
+</table>
+<table style="width:100%;">
+
+<thead>
+<tr class="header">
+<th style="text-align: center;">模型</th>
+<th style="text-align: center;">Retinopathy</th>
+<th style="text-align: center;">Clevr-Count</th>
+<th style="text-align: center;">Clevr-Dist</th>
+<th style="text-align: center;">DMLab</th>
+<th style="text-align: center;">dSpr-Loc</th>
+<th style="text-align: center;">dSpr-Ori</th>
+<th style="text-align: center;">KITTI-Dist</th>
+<th style="text-align: center;">sNORB-Azim</th>
+<th style="text-align: center;">sNORB-Elev</th>
+<th style="text-align: center;">平均</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;">ViT-H/14 (JFT)</td>
+<td style="text-align: center;">76.6</td>
+<td style="text-align: center;">91.7</td>
+<td style="text-align: center;">63.8</td>
+<td style="text-align: center;">53.1</td>
+<td style="text-align: center;">79.4</td>
+<td style="text-align: center;">63.3</td>
+<td style="text-align: center;">84.5</td>
+<td style="text-align: center;">33.2</td>
+<td style="text-align: center;">51.2</td>
+<td style="text-align: center;">77.6</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">ViT-L/16 (JFT)</td>
+<td style="text-align: center;">77.1</td>
+<td style="text-align: center;">86.4</td>
+<td style="text-align: center;">63.1</td>
+<td style="text-align: center;">49.7</td>
+<td style="text-align: center;">74.5</td>
+<td style="text-align: center;">60.5</td>
+<td style="text-align: center;">82.2</td>
+<td style="text-align: center;">36.2</td>
+<td style="text-align: center;">51.1</td>
+<td style="text-align: center;">76.3</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">ViT-L/16 (I21k)</td>
+<td style="text-align: center;">75.3</td>
+<td style="text-align: center;">70.3</td>
+<td style="text-align: center;">56.1</td>
+<td style="text-align: center;">41.9</td>
+<td style="text-align: center;">74.7</td>
+<td style="text-align: center;">64.9</td>
+<td style="text-align: center;">79.9</td>
+<td style="text-align: center;">30.5</td>
+<td style="text-align: center;">41.7</td>
+<td style="text-align: center;">72.7</td>
+</tr>
+</tbody>
+</table>
+<p><strong>表 9：</strong> VTAB-1k 各任务的性能分解。</p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/AI/" class="print-no-link">#AI</a>
+      
+        <a href="/tags/CV/" class="print-no-link">#CV</a>
+      
+        <a href="/tags/Vision-Transformer/" class="print-no-link">#Vision Transformer</a>
+      
+        <a href="/tags/Vit/" class="print-no-link">#Vit</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>Vision Transformer阅读笔记</div>
+      <div>http://example.com/2026/08/28/Vision Transformer阅读笔记/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Qingxing Liao</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2026年8月28日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2026/08/28/Swin%20Transformer%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/" title="Swin Transformer阅读笔记">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">Swin Transformer阅读笔记</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2026/08/28/hello-world/" title="Hello World">
+                        <span class="hidden-mobile">Hello World</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+  
+  
+
+
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    function isExpandAllEnabled() {
+      return CONFIG.toc && CONFIG.toc.expand_all === true;
+    }
+    function expandAllToc() {
+      if (!isExpandAllEnabled()) { return; }
+      jQuery('#toc-body .tocbot-is-collapsed').removeClass('tocbot-is-collapsed');
+    }
+    function updateTocToggle($li, $childList) {
+      var $toggle = $li.children('.toc-toggle');
+      if ($toggle.length === 0) { return; }
+      var collapsed = $childList.hasClass('tocbot-is-collapsed');
+      $toggle
+        .toggleClass('toc-toggle-collapsed', collapsed)
+        .toggleClass('toc-toggle-expanded', !collapsed);
+    }
+    function bindTocToggle() {
+      if (!isExpandAllEnabled()) { return; }
+      jQuery('#toc-body .toc-list-item').each(function() {
+        var $li = jQuery(this);
+        var $childList = $li.children('ol');
+        if ($childList.length === 0) {
+          if ($li.children('.toc-toggle').length === 0) {
+            $li.prepend('<span class="toc-toggle toc-toggle-placeholder" aria-hidden="true">›</span>');
+          }
+          return;
+        }
+
+        if ($li.children('.toc-toggle').length === 0) {
+          $li.prepend('<span class="toc-toggle toc-toggle-expanded" aria-hidden="true">›</span>');
+        }
+        updateTocToggle($li, $childList);
+      });
+      jQuery('#toc-body').off('click.tocToggle').on('click.tocToggle', '.toc-toggle', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        var $li = jQuery(this).parent('.toc-list-item');
+        var $childList = $li.children('ol');
+        if ($childList.length === 0) { return; }
+        $childList.toggleClass('tocbot-is-collapsed');
+        updateTocToggle($li, $childList);
+      });
+      if (!window.__tocToggleObserver) {
+        window.__tocToggleObserver = new MutationObserver(function(mutations) {
+          mutations.forEach(function(mutation) {
+            if (mutation.type !== 'attributes' || mutation.attributeName !== 'class') { return; }
+            var $list = jQuery(mutation.target);
+            var $li = $list.parent('.toc-list-item');
+            if ($li.length === 0) { return; }
+            updateTocToggle($li, $list);
+          });
+        });
+        jQuery('#toc-body ol').each(function() {
+          window.__tocToggleObserver.observe(this, { attributes: true });
+        });
+      }
+    }
+    var tocConfig = Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc);
+    if (isExpandAllEnabled()) {
+      tocConfig.collapseDepth = 6;
+    }
+    window.tocbot.init(tocConfig);
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+    expandAllToc();
+    bindTocToggle();
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+        expandAllToc();
+        bindTocToggle();
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/5.0.0/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  
+      <script>
+        if (!window.MathJax) {
+          window.MathJax = {
+            tex    : {
+              inlineMath: { '[+]': [['$', '$']] }
+            },
+            loader : {
+              load: ['ui/lazy']
+            },
+            options: {
+              renderActions: {
+                insertedScript: [200, () => {
+                  document.querySelectorAll('mjx-container').forEach(node => {
+                    let target = node.parentNode;
+                    if (target.nodeName.toLowerCase() === 'li') {
+                      target.parentNode.classList.add('has-jax');
+                    }
+                  });
+                }, '', false]
+              }
+            }
+          };
+        } else {
+          MathJax.startup.document.state(0);
+          MathJax.texReset();
+          MathJax.typeset();
+          MathJax.typesetPromise();
+        }
+
+        Fluid.events.registerRefreshCallback(function() {
+          if ('MathJax' in window && MathJax.startup.document && typeof MathJax.startup.document.state === 'function') {
+            MathJax.startup.document.state(0);
+            MathJax.texReset();
+            MathJax.typeset();
+            MathJax.typesetPromise();
+          }
+        });
+      </script>
+    
+
+  <script  src="https://lib.baomitu.com/mathjax/3.2.2/es5/tex-mml-chtml.js" ></script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>
