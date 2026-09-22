@@ -21,7 +21,7 @@
   
     <meta name="description" content="综述：事件视觉 Guillermo Gallego、Tobi Delbrück、Garrick Orchard、Chiara Bartolozzi、Brian Taba、Andrea Censi、Stefan Leutenegger、Andrew J. Davison、Jörg Conradt、Kostas Daniilidis、Davide Scaramuzza  本文已被 IEEE Tr">
 <meta property="og:type" content="article">
-<meta property="og:title" content="“事件视觉”综述">
+<meta property="og:title" content="“事件视觉”综述 A Survey of Event-Based Vision">
 <meta property="og:url" content="http://example.com/2026/09/22/A%20Survey%20of%20Event-based%20Vision/index.html">
 <meta property="og:site_name" content="Qingxingliao Blog">
 <meta property="og:description" content="综述：事件视觉 Guillermo Gallego、Tobi Delbrück、Garrick Orchard、Chiara Bartolozzi、Brian Taba、Andrea Censi、Stefan Leutenegger、Andrew J. Davison、Jörg Conradt、Kostas Daniilidis、Davide Scaramuzza  本文已被 IEEE Tr">
@@ -40,7 +40,7 @@
 <meta property="og:image" content="http://example.com/2026/09/22/A%20Survey%20of%20Event-based%20Vision/Pasted%20image%2020260920173223.png">
 <meta property="og:image" content="http://example.com/2026/09/22/A%20Survey%20of%20Event-based%20Vision/Pasted%20image%2020260920173335.png">
 <meta property="article:published_time" content="2026-09-21T17:58:29.000Z">
-<meta property="article:modified_time" content="2026-09-22T10:28:15.499Z">
+<meta property="article:modified_time" content="2026-09-22T13:53:56.098Z">
 <meta property="article:author" content="Qingxing Liao">
 <meta property="article:tag" content="Event-based Vision">
 <meta property="article:tag" content="Survey">
@@ -49,7 +49,7 @@
   
   
   
-  <title>“事件视觉”综述 - Qingxingliao Blog</title>
+  <title>“事件视觉”综述 A Survey of Event-Based Vision - Qingxingliao Blog</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -318,7 +318,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle" data-typed-text="“事件视觉”综述"></span>
+            <span id="subtitle" data-typed-text="“事件视觉”综述 A Survey of Event-Based Vision"></span>
           
         </div>
 
@@ -352,7 +352,7 @@
         
         
         
-          808 分钟
+          811 分钟
         
       </span>
     
@@ -391,7 +391,7 @@
       <div class="container nopadding-x-md" id="board-ctn">
         <div id="board">
           <article class="post-content mx-auto">
-            <h1 id="seo-header">“事件视觉”综述</h1>
+            <h1 id="seo-header">“事件视觉”综述 A Survey of Event-Based Vision</h1>
             
             
               <div class="markdown-body">
@@ -402,16 +402,17 @@
 <p>本文已被 IEEE Transactions on Pattern Analysis and Machine Intelligence 接收，2020。原文中的文献序号、缩写与 URL 均予以保留。</p>
 </blockquote>
 <h2 id="摘要">摘要</h2>
-<p>事件相机是一类受生物视觉启发的传感器，与传统帧式相机不同：它不以固定帧率采集图像，而是异步测量每个像素的亮度变化，并输出由变化时间、位置和符号编码的事件流。相较于传统相机，事件相机具有微秒量级时间分辨率、极高动态范围（140 dB，而传统相机约为 60 dB）、低功耗和千赫兹量级像素带宽，因此可减轻运动模糊，在低延迟、高速和高动态范围等传统相机难以胜任的机器人与计算机视觉场景中颇具潜力。</p>
+<p><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/581835811">事件相机</a>是一类受生物视觉启发的传感器，与传统帧式相机不同：它不以固定帧率采集图像，而是异步测量每个像素的亮度变化，并输出由变化时间、位置和符号编码的事件流。相较于传统相机，事件相机具有微秒量级时间分辨率、极高动态范围（140 dB，而传统相机约为 60 dB）、低功耗和千赫兹量级像素带宽，因此可减轻运动模糊，在低延迟、高速和高动态范围等传统相机难以胜任的机器人与计算机视觉场景中颇具潜力。</p>
 <p>不过，要释放这类非传统输出的潜能，必须设计新的处理方法。本文全面综述新兴的事件视觉领域，重点讨论为发挥事件相机突出特性而发展的应用与算法。文章从工作原理、可用传感器及其已解决的任务讲起，覆盖低层视觉（特征检测与跟踪、光流等）到高层视觉（重建、分割、识别）；还讨论事件处理技术（含学习方法）及适用于这类传感器的专用处理器，如脉冲神经网络。最后指出仍待解决的挑战与未来机遇，以寻求一种更高效、更具生物启发性的机器感知和交互方式。</p>
 <p><strong>关键词：</strong>事件相机；生物启发视觉；异步传感器；低延迟；高动态范围；低功耗。</p>
 <h2 id="引言与应用">1 引言与应用</h2>
 <p>“大脑就是想象力；这令我兴奋，我想造出一块能够想象的芯片。”1986 年，Caltech 研究生 Misha Mahowald 与 Carver Mead 教授从生物和工程两个角度研究双目问题，由此开启了相关探索。1991 年，《Scientific American》封面上一幅由模仿眼睛神经架构的“硅视网膜”获得的猫图像，展示了新的强大计算途径，点燃了神经形态工程。今天，人们仍在追逐同一愿景：理解大脑，并把它构建在计算芯片上；代表性大型计划包括 Human Brain Project、Blue Brain Project 以及美国 BRAIN（Brain Research through Advancing Innovative Neurotechnologies）Initiative。</p>
-<p>本文概述硅视网膜、即“事件相机”[2]–[5] 的生物启发技术，关注其解决经典及新型计算机视觉和机器人任务的能力。视觉是人类认识世界、并与大脑共同学习新事物的主导感觉。近年来，原型事件相机的可获得性及其在高速运动估计 [6]、[7] 与高动态范围（HDR）成像 [8] 等帧式相机困难任务上的优势，引起了学界和产业界广泛关注。</p>
-<p>事件相机根据场景动态而非与被观测场景无关的时钟对光进行采样，因此改变了视觉信息采集范式。它具有微秒量级的时间分辨率与低延迟、约 140 dB（标准相机约 60 dB）的动态范围以及低功耗；特别适合高速、高动态范围下的机器人和可穿戴应用。事件相机自 2008 年起才实现商用 [2]，但快速增长的文献、Samsung [5] 与 Prophesee 等公司提出的量产计划，显示出它在移动机器人、增强/虚拟现实（AR/VR）和电子游戏中的商业潜力。由于它异步测量的是逐像素亮度变化（事件），而非恒定速率的“绝对”亮度，仍须借助新方法处理其输出。</p>
-<h3 id="事件相机的应用">事件相机的应用</h3>
-<p>事件相机特别适用于机器人、可穿戴电子等实时交互系统 [10]：在这些系统中，不受控照明、延迟和功耗至关重要 [11]。已有应用包括对象跟踪 [12]、[13]、监视 [14]、对象/手势识别 [15]–[17]、深度估计 [18]、[19]、结构光三维扫描 [20]、光流 [21]、[22]、HDR 图像重建 [8]、[23]、[24] 与同步定位和建图（SLAM）[25]–[27]。随着相机普及，去模糊 [28]、星跟踪 [29]、[30] 等新应用也将出现。</p>
-<p>本文余下部分依次介绍事件相机的原理、优点与挑战（第 2 节），事件信息提取方法及其生物学启发（第 3 节），低层至高层的应用与算法（第 4 节），神经形态处理器和嵌入式系统（第 5 节），软件、数据集和模拟器（第 6 节），最后给出讨论与结论。</p>
+<p>本文概述硅视网膜、即“<mark style="background: #BBFABBA6;">事件相机</mark>”[2]–[5] 的生物启发技术，关注其<mark style="background: #BBFABBA6;">解决经典及新型计算机视觉和机器人任务的能力</mark>。<mark style="background: #BBFABBA6;">视觉</mark>是人类认识世界、并与大脑共同学习新事物的主导感觉。近年来，原型事件相机的可获得性及其在高速运动估计 [6]、[7] 与高动态范围（HDR）成像 [8] 等帧式相机困难任务上的优势，引起了学界和产业界广泛关注。</p>
+<p><mark style="background: #BBFABBA6;">事件相机</mark>是一种异步传感器，根据场景动态而非与被观测场景无关的时钟对光进行采样，彻底改变了视觉信息接收的模式。其<mark style="background: #BBFABBA6;">优势</mark>包括：极高的时间分辨率和极低的延迟（均在微秒量级）、极高的动态范围（140 dB，而标准相机仅为 60 dB）以及低功耗。因此，在标准相机难以应对的场景（如高速运动和高动态范围环境）中，事件相机在机器人技术和可穿戴设备领域展现出巨大的应用潜力。尽管事件相机直到 2008 年才实现商业化 [2]，但近期<a target="_blank" rel="noopener" href="https://github.com/uzh-rpg/event-based_vision_resources">关于此类新型传感器的文献</a>以及三星（Samsung）[5] 和 Prophesee 等公司宣布的量产计划表明，业界对利用这些新型视觉传感器开发移动机器人、增强现实与虚拟现实（AR/VR）及电子游戏应用抱有浓厚的商业兴趣。然而，由于事件相机的<mark style="background: #BBFABBA6;">工作原理</mark>与标准相机截然不同——它们异步测量逐像素的亮度变化（称为“事件”），而非以恒定速率测量“绝对”亮度——因此<mark style="background: #BBFABBA6;">需要创新的方法来处理其输出数据并充分发挥其潜力</mark>。</p>
+<h4 id="事件相机的应用">事件相机的应用：</h4>
+<p>与其他传感方式相比，事件相机具有优势的<mark style="background: #BBFABBA6;">典型场景</mark>包括实时交互系统（如机器人或可穿戴电子设备 [10]），在这些场景中，非受控光照条件下的运行能力、低延迟和低功耗至关重要 [11]。事件相机被广泛应用于目标跟踪 [12], [13]、安防监控 [14] 以及物体/手势识别 [15], [16], [17]。此外，它们在深度估计 [18], [19]、结构光三维扫描 [20]、光流估计 [21], [22]、HDR 图像重建 [8], [23], [24] 以及同步定位与建图（Simultaneous Localization and Mapping，SLAM）[25], [26], [27] 等领域也极具应用价值。基于事件的视觉是一个日益发展的研究领域；随着事件相机得到广泛应用 [9]，诸如图像去模糊 [28] 或恒星追踪 [29], [30] 等其他应用也将随之涌现。</p>
+<h4 id="本文结构安排">本文结构安排：</h4>
+<p>第 2 节介绍了<mark style="background: #BBFABBA6;">事件相机</mark>的工作原理与优势，以及作为新型视觉传感器所带来的挑战。第 3 节探讨了<mark style="background: #BBFABBA6;">从事件相机输出中提取信息</mark>的几种常用方法，并讨论了其中部分方法背后的生物学启发。第 4 节回顾了<mark style="background: #BBFABBA6;">事件相机的应用（涵盖从底层到高层的视觉任务）</mark>以及旨在挖掘其潜力的各类<mark style="background: #BBFABBA6;">算法</mark>，同时指出了各主题下的未来研究机遇与待解决的挑战。第 5 节介绍了神经形态处理器与嵌入式系统。第 6 节概述了用于事件相机研究的软件、数据集、仿真器及其他相关信息资源。最后，本文以讨论（第 7 节）和结论（第 8 节）收尾。</p>
 <h2 id="事件相机的工作原理">2 事件相机的工作原理</h2>
 <p>与按照外部时钟设定的速率（例如 30 fps）获取完整图像的标准相机不同，事件相机（如动态视觉传感器 DVS [2], [31], [32], [33], [34]）针对场景中的亮度变化，以异步且独立的方式对每个像素进行响应（图 1b）。因此，事件相机的输出是一个数据速率可变的数字“事件”或“脉冲”序列；每个事件代表特定时刻某个像素处亮度（对数强度）发生了预定幅度的变化（图 1b）（第 2.4 节）。这种编码方式的灵感来自于生物视觉通路中神经脉冲发放的特性（第 3.3 节）。</p>
 <p>每个像素在发送事件时都会记录当前的对数强度值，并持续监测亮度变化是否相对于该记录值达到足够幅度（图 1a）。当变化超过阈值时，相机会发送一个事件；该事件包含变化的 x、y 坐标位置、时间 t 以及 1 位的极性 p（即亮度增加“ON”或减少“OFF”），并从芯片传输出去。这种事件输出形式如图 1b、1e 和 1f 所示。 <img src="/2026/09/22/A%20Survey%20of%20Event-based%20Vision/Pasted%20image%2020260920171432.png" srcset="/img/loading.gif" lazyload class="" title="图1：DAVIS 相机概览。DAVIS 在同一像素阵列中集成事件式 DVS [2] 和帧式有源像素传感器（APS），每个像素共享光电二极管。(a) 简化像素电路（红：DVS；蓝：APS）；(b) DVS 像素由光产生事件的示意；(c)–(d) 芯片与 USB 相机；(e) 白色方块随黑盘旋转所产生的灰度帧和时空螺旋事件；时空事件由绿色（过去）到红色（当前）着色；(f) 自然场景中帧与叠加事件，帧相较低延迟事件滞后。改编自 [4]、[35]；DVS、DAVIS、ATIS 像素的深入比较见 [36]。"></p>
@@ -1681,7 +1682,7 @@ E=\{e_k\}_{k=1}^{N_e}
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>“事件视觉”综述</div>
+      <div>“事件视觉”综述 A Survey of Event-Based Vision</div>
       <div>http://example.com/2026/09/22/A Survey of Event-based Vision/</div>
     </div>
     <div class="license-meta">
