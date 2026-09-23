@@ -40,7 +40,7 @@
 <meta property="og:image" content="http://example.com/2026/09/22/A%20Survey%20of%20Event-based%20Vision/Pasted%20image%2020260920173223.png">
 <meta property="og:image" content="http://example.com/2026/09/22/A%20Survey%20of%20Event-based%20Vision/Pasted%20image%2020260920173335.png">
 <meta property="article:published_time" content="2026-09-21T17:58:29.000Z">
-<meta property="article:modified_time" content="2026-09-23T03:49:09.218Z">
+<meta property="article:modified_time" content="2026-09-23T10:02:04.531Z">
 <meta property="article:author" content="Qingxing Liao">
 <meta property="article:tag" content="Event-based Vision">
 <meta property="article:tag" content="Survey">
@@ -441,11 +441,11 @@
 <li><p><strong>高像素带宽与无模糊</strong>：像素连续监视、读出按需发生；与以帧周期采样造成混叠的相机不同，DVS 的连续时间响应不把奈奎斯特频率以上的变化混叠回基带。</p></li>
 </ul>
 <h3 id="新感知范式带来的挑战">2.3 新感知范式带来的挑战</h3>
-<p>事件相机代表了视觉信息获取方式的一次范式转变。因此，为了充分发挥事件相机的优势，我们需要设计创新的方法（涵盖算法与硬件层面）来处理所获取的数据并从中提取信息。具体而言，面临的挑战包括：</p>
-<p>（1) 应对不同的时空输出特性：事件相机的输出与标准相机截然不同——事件流是异步且在空间上稀疏的，而传统图像则是同步且密集的。因此，针对图像序列设计的基于帧（frame-based）的视觉算法无法直接应用于事件数据。</p>
-<p>（2) 应对不同的光度感知机制：与标准相机提供的灰度信息不同，每个事件仅包含二值化的亮度变化信息（即亮度增加或减少）。这种亮度变化不仅取决于场景本身的亮度，还取决于场景与相机之间当前及过去的相对运动。</p>
-<p>（3) 应对噪声与动态效应：所有视觉传感器都不可避免地存在噪声（源于光子的固有散粒噪声及晶体管电路噪声）以及各种非理想特性。对于事件相机而言，情况尤为复杂，因为其时间对比度量化过程十分复杂，且尚未得到完全的机理表征。</p>
-<p>因此，新方法需要重新审视事件数据在时空、光度及随机性方面的本质特征。这引发了以下问题：针对特定任务，从事件流中提取相关信息的最佳途径是什么？以及如何对噪声和非理想效应进行建模，从而更有效地从事件流中提取有意义的信息？</p>
+<p>事件相机代表了视觉信息获取方式的一次范式转变。因此，为了充分发挥事件相机的优势，我们需要设计<mark style="background: #BBFABBA6;">创新的方法（涵盖算法与硬件层面）</mark>来处理所获取的数据并从中提取信息。具体而言，面临的<mark style="background: #BBFABBA6;">挑战</mark>包括：</p>
+<p>（1）应对不同的时空输出特性：事件相机的输出与标准相机截然不同——<mark style="background: #BBFABBA6;">事件流是异步且在空间上稀疏的</mark>，而传统图像则是同步且密集的。因此，针对图像序列设计的基于帧（frame-based）的视觉算法无法直接应用于事件数据。</p>
+<p>（2）应对不同的光度感知机制：与标准相机提供的灰度信息不同，每个事件仅包含<mark style="background: #BBFABBA6;">二值化的亮度变化信息</mark>（即亮度增加或减少）。这种亮度变化不仅取决于场景本身的亮度，还取决于场景与相机之间当前及过去的相对运动。</p>
+<p>（3）应对噪声与动态效应：所有视觉传感器都不可避免地存在<mark style="background: #BBFABBA6;">噪声</mark>（源于光子的固有散粒噪声及晶体管电路噪声）以及各种非理想特性。对于事件相机而言，情况尤为复杂，因为其时间对比度量化过程十分复杂，且尚未得到完全的机理表征。</p>
+<p>因此，新方法需要重新审视事件数据在时空、光度及随机性方面的本质特征。这引发了以下问题：针对特定任务，<mark style="background: #FFB86CA6;">从事件流中提取相关信息的最佳途径</mark>是什么？以及<mark style="background: #FFB86CA6;">如何对噪声和非理想效应进行建模</mark>，从而更有效地从事件流中提取有意义的信息？</p>
 <h3 id="事件生成模型">2.4 事件生成模型</h3>
 <p>事件相机 [2] 包含相互独立的像素，这些像素响应其对数光电流 <span class="math inline">\(L = \log(I)\)</span>（即“亮度”）的变化。具体而言，在无噪声场景下，当某像素 <span class="math inline">\(x_k = (x_k, y_k)\)</span> 处的亮度增量 <span class="math display">\[\Delta L(x_k, t_k) = L(x_k, t_k) - L(x_k, t_k - \Delta t_k) \quad (1)\]</span> 达到时间对比度阈值 <span class="math inline">\(\pm C\)</span> （图 1b）时，即<span class="math display">\[\Delta L(x_k, t_k) = p_k C \quad (2)\]</span>该像素便会在时刻 <span class="math inline">\(t_k\)</span> 触发一个事件 <span class="math inline">\(e_k = (x_k, t_k, p_k)\)</span>，其中 <span class="math inline">\(C &gt; 0\)</span>，<span class="math inline">\(\Delta t_k\)</span> 为同一像素上一次事件发生后经过的时间，极性 <span class="math inline">\(p_k \in \{+1, -1\}\)</span> 表示亮度变化的符号 [2]。</p>
 <h4 id="对比度灵敏度-c">对比度灵敏度 <span class="math inline">\(C\)</span> ：</h4>
