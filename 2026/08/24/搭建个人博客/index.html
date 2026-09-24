@@ -22,12 +22,12 @@
     <meta name="description" content="环境搭建 安装 Git Git 下载，Windows 平台直接下载 exe 文件安装即可。 Ubuntu 平台使用指令安装： 1sudo apt install git 安装 NodeJS NodeJS 下载。Hexo 是基于 NodeJS 编写的，所以需要安装 NodeJS 和 npm 工具；Windows 平台同样下载 exe 文件安装即可。 安装完成后在 cmd 窗口查看是否安">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Hexo+Github搭建个人博客">
-<meta property="og:url" content="http://example.com/2026/09/06/%E6%90%AD%E5%BB%BA%E4%B8%AA%E4%BA%BA%E5%8D%9A%E5%AE%A2/index.html">
+<meta property="og:url" content="http://example.com/2026/08/24/%E6%90%AD%E5%BB%BA%E4%B8%AA%E4%BA%BA%E5%8D%9A%E5%AE%A2/index.html">
 <meta property="og:site_name" content="Qingxingliao Blog">
 <meta property="og:description" content="环境搭建 安装 Git Git 下载，Windows 平台直接下载 exe 文件安装即可。 Ubuntu 平台使用指令安装： 1sudo apt install git 安装 NodeJS NodeJS 下载。Hexo 是基于 NodeJS 编写的，所以需要安装 NodeJS 和 npm 工具；Windows 平台同样下载 exe 文件安装即可。 安装完成后在 cmd 窗口查看是否安">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2026-09-05T16:26:40.000Z">
-<meta property="article:modified_time" content="2026-09-05T16:59:32.657Z">
+<meta property="article:published_time" content="2026-08-23T16:26:40.000Z">
+<meta property="article:modified_time" content="2026-09-24T02:24:09.937Z">
 <meta property="article:author" content="Qingxing Liao">
 <meta property="article:tag" content="Github">
 <meta property="article:tag" content="Hexo">
@@ -96,7 +96,7 @@
   <header>
     
 
-<div class="header-inner" style="height: 70vh;">
+<div class="header-inner" style="height: 100vh;">
   <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
   <div class="container">
     <a class="navbar-brand" href="/">
@@ -316,8 +316,8 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2026-09-06 00:26" pubdate>
-          2026年9月6日 凌晨
+        <time datetime="2026-08-24 00:26" pubdate>
+          2026年8月24日 凌晨
         </time>
       </span>
     
@@ -352,6 +352,10 @@
         
       </div>
 
+      
+        <div class="scroll-down-bar">
+          <i class="iconfont icon-arrowdown"></i>
+        </div>
       
     </div>
   </div>
@@ -438,7 +442,7 @@
 <p>右键打开 Git Bash，输入以下指令：</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash">git config --global user.name <span class="hljs-string">&quot;sunnyliao1314&quot;</span><br>git config --global user.email <span class="hljs-string">&quot;lxy11132@qq.com&quot;</span><br></code></pre></td></tr></table></figure>
 <p>用户名和邮箱根据自己的信息进行修改。</p>
-<p>生成 SSH key： <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">ssh-keygen -t rsa -C <span class="hljs-string">&quot;819096127@qq.com&quot;</span><br></code></pre></td></tr></table></figure></p>
+<p>生成 SSH key： <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">ssh-keygen -t rsa -C <span class="hljs-string">&quot;lxy11132@qq.com&quot;</span><br></code></pre></td></tr></table></figure></p>
 <p>按照提示一路回车即可。</p>
 <p>打开 <a target="_blank" rel="noopener" href="https://github.com/">Github</a>，在头像下方点击 Setting，再点击 SSH and GPG keys，新建一个 SSH，名称可以随便起，比如 <code>HEXO_DEPLOY</code>。</p>
 <p>打开上一步生成的 SSH key，Windows 中通常位于 <code>User/.ssh/id_rsa.pub</code>。将里面的内容复制到新建的 SSH 框中，点击确定保存。在终端中输入 <code>ssh -T git@github.com</code>，如果出现个人用户名，即代表连接成功。</p>
@@ -500,7 +504,7 @@
   <div class="license-box my-3">
     <div class="license-title">
       <div>Hexo+Github搭建个人博客</div>
-      <div>http://example.com/2026/09/06/搭建个人博客/</div>
+      <div>http://example.com/2026/08/24/搭建个人博客/</div>
     </div>
     <div class="license-meta">
       
@@ -512,7 +516,7 @@
       
         <div class="license-meta-item license-meta-date">
           <div>发布于</div>
-          <div>2026年9月6日</div>
+          <div>2026年8月24日</div>
         </div>
       
       
@@ -544,21 +548,15 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/2026/09/22/A%20Survey%20of%20Event-based%20Vision/" title="综述阅读——“事件视觉”">
+                      <a href="/2026/08/28/Vision%20Transformer%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/" title="Vision Transformer阅读笔记">
                         <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">综述阅读——“事件视觉”</span>
+                        <span class="hidden-mobile">Vision Transformer阅读笔记</span>
                         <span class="visible-mobile">上一篇</span>
                       </a>
                     
                   </article>
                   <article class="post-next col-6">
                     
-                    
-                      <a href="/2026/09/04/%E3%80%903Blue1Brown%E3%80%91Attention%20Pattern%20in%20Transformers/" title="Attention Pattern in Transformer">
-                        <span class="hidden-mobile">Attention Pattern in Transformer</span>
-                        <span class="visible-mobile">下一篇</span>
-                        <i class="iconfont icon-arrowright"></i>
-                      </a>
                     
                   </article>
                 </div>
